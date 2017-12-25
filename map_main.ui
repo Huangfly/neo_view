@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>map_main</class>
+ <widget class="QWidget" name="map_main">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>NeoSlamWare</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget{
+background: rgb(66, 66, 66);
+}</string>
+  </property>
+  <widget class="map_view" name="_map_view" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>100</y>
+     <width>800</width>
+     <height>800</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>120</y>
+     <width>99</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+color:rgb(255, 255, 255);
+border-radius:10px;
+background-color:rgb(78, 125, 224);
+}
+
+QPushButton:pressed {
+    background-color: rgb(28, 59, 124);
+}
+
+QPushButton::checked {
+   background-color: rgb(28, 59, 124);
+}</string>
+   </property>
+   <property name="text">
+    <string>Action Robot</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_2">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>120</y>
+     <width>99</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+color:rgb(255, 255, 255);
+border-radius:10px;
+background-color:rgb(78, 125, 224);
+}
+
+QPushButton:pressed {
+    background-color: rgb(28, 59, 124);
+}
+
+QPushButton::checked {
+   background-color: rgb(28, 59, 124);
+}</string>
+   </property>
+   <property name="text">
+    <string>set Goal</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_3">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>120</y>
+     <width>99</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+color:rgb(255, 255, 255);
+border-radius:10px;
+background-color:rgb(78, 125, 224);
+}
+
+QPushButton:pressed {
+    background-color: rgb(28, 59, 124);
+}
+
+QPushButton::checked {
+   background-color: rgb(28, 59, 124);
+}</string>
+   </property>
+   <property name="text">
+    <string>Reset</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_4">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>120</y>
+     <width>99</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+color:rgb(255, 255, 255);
+border-radius:10px;
+background-color:rgb(78, 125, 224);
+}
+
+QPushButton:pressed {
+    background-color: rgb(28, 59, 124);
+}
+
+QPushButton::checked {
+   background-color: rgb(28, 59, 124);
+}</string>
+   </property>
+   <property name="text">
+    <string>run Goals</string>
+   </property>
+  </widget>
+  <widget class="map_menu" name="_map_menu" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>100</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>map_view</class>
+   <extends>QWidget</extends>
+   <header location="global">map_view.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>map_menu</class>
+   <extends>QWidget</extends>
+   <header location="global">map_menu.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
