@@ -17,10 +17,16 @@ public:
     static void* RobotStatus(void *data);
     void OnSendGoal(void *data);
     static void *SendGoal(void *data);
+    void OnCancelGoal(void *data);
+    static void *CancelGoal(void *data);
+    void OnActivateNode(std::string str,char enable);
+    static void *ActivateNode(void *data);
 
     static bool isRunOnRobotStatus;
     static bool isRunOnDownloadMap;
     static bool isRunOnSendGoal;
+    static bool isRunOnCancelGoal;
+    static bool isRunOnActivateNode;
 
 signals:
 

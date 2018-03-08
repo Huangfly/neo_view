@@ -36,8 +36,8 @@ background: rgb(66, 66, 66);
     <rect>
      <x>20</x>
      <y>120</y>
-     <width>99</width>
-     <height>27</height>
+     <width>100</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="focusPolicy">
@@ -61,14 +61,17 @@ QPushButton::checked {
    <property name="text">
     <string>Action Robot</string>
    </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="pushButton_2">
    <property name="geometry">
     <rect>
      <x>130</x>
      <y>120</y>
-     <width>99</width>
-     <height>27</height>
+     <width>100</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="focusPolicy">
@@ -90,7 +93,7 @@ QPushButton::checked {
 }</string>
    </property>
    <property name="text">
-    <string>set Goal</string>
+    <string>Set Goal</string>
    </property>
    <property name="checkable">
     <bool>true</bool>
@@ -101,8 +104,8 @@ QPushButton::checked {
     <rect>
      <x>240</x>
      <y>120</y>
-     <width>99</width>
-     <height>27</height>
+     <width>100</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="focusPolicy">
@@ -132,8 +135,8 @@ QPushButton::checked {
     <rect>
      <x>350</x>
      <y>120</y>
-     <width>99</width>
-     <height>27</height>
+     <width>100</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="focusPolicy">
@@ -155,7 +158,7 @@ QPushButton::checked {
 }</string>
    </property>
    <property name="text">
-    <string>run Goals</string>
+    <string>Run Goals</string>
    </property>
   </widget>
   <widget class="map_menu" name="_map_menu" native="true">
@@ -166,6 +169,37 @@ QPushButton::checked {
      <width>800</width>
      <height>100</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_5">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>120</y>
+     <width>100</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+color:rgb(255, 255, 255);
+border-radius:10px;
+background-color:rgb(78, 125, 224);
+}
+
+QPushButton:pressed {
+    background-color: rgb(28, 59, 124);
+}
+
+QPushButton::checked {
+   background-color: rgb(28, 59, 124);
+}</string>
+   </property>
+   <property name="text">
+    <string>Cancel Move</string>
    </property>
   </widget>
  </widget>

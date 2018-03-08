@@ -4,6 +4,9 @@
 extern QString sysIP;
 extern QString sysPort;
 
+#define NODE_ON  1
+#define NODE_OFF 0
+
 
 void map_menu::OnPatrol()
 {
@@ -18,6 +21,18 @@ void map_menu::OnPatrol()
         this->isPatrol = false;
     }
 }
+
+void map_menu::OnNav_NavigationMode()
+{
+
+}
+
+void map_menu::OnNav_ExploreMode()
+{
+
+}
+
+
 
 void map_menu::OnClearGoals()
 {
@@ -61,12 +76,19 @@ map_menu::map_menu(QWidget *parent) :
     QRegExpValidator *pReg2 = new QRegExpValidator(rx2, this);
     ui->lineEdit_Port->setValidator(pReg2);
 
-    connect(ui->lineEdit_IP,SIGNAL(textChanged(QString)),this,SLOT(OnEditChange()));
-    connect(ui->lineEdit_Port,SIGNAL(textChanged(QString)),this,SLOT(OnEditChange()));
+
+
     connect(ui->PatrolCTL,SIGNAL(clicked()),this,SLOT(OnPatrol()));
+    connect(ui->Nav_NavigationMode,SIGNAL(clicked()),this,SLOT(OnNav_NavitionMode()));
+    connect(ui->Nav_ExploreMode,SIGNAL(clicked()),this,SLOT(OnNav_ExploreMode()));
     connect(ui->clearGoals,SIGNAL(clicked()),this,SLOT(OnClearGoals()));
+
     connect(ui->slam_savemap,SIGNAL(clicked()),this,SLOT(OnSlam_SaveMap()));
     connect(ui->slam_clearMap,SIGNAL(clicked()),this,SLOT(OnSlam_ClearMap()));
+
+    connect(ui->lineEdit_IP,SIGNAL(textChanged(QString)),this,SLOT(OnEditChange()));
+    connect(ui->lineEdit_Port,SIGNAL(textChanged(QString)),this,SLOT(OnEditChange()));
+
     this->isPatrol = ui->PatrolCTL->isChecked();
 }
 

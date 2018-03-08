@@ -14,6 +14,8 @@ class map_menu : public QTabWidget
     Q_OBJECT
 public slots:
     void OnPatrol();
+    void OnNav_NavigationMode();
+    void OnNav_ExploreMode();
     void OnClearGoals();
 
 

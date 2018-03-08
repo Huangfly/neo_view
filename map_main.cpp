@@ -81,6 +81,15 @@ void map_main::OnSendGoal()
     if(!socketThread::isRunOnSendGoal){
         m_socket->OnSendGoal(this);
     }
+    emit ui->pushButton_2->click();
+}
+
+void map_main::OnCancelMove()
+{
+    ui->_map_view->clearGoals();
+    if(!socketThread::isRunOnCancelGoal){
+        m_socket->OnCancelGoal(this);
+    }
 }
 
 map_main::map_main(QWidget *parent) :
@@ -97,29 +106,33 @@ map_main::map_main(QWidget *parent) :
 
     this->m_map_view_ctl = ui->_map_view;
     this->m_map_menu_ctl = ui->_map_menu;
-    //this->socket = new QTcpSocket(this);
     this->isActionRobot = false;
     this->m_robot_timer = new QTimer(this);
 
-
+    connect(ui->pushButton,SIGNAL(clicked()),SLOT(OnActionRobot()));
     connect(ui->pushButton_2,SIGNAL(clicked()),SLOT(OnLockRot()));
     connect(ui->pushButton_3,SIGNAL(clicked()),SLOT(OnResetPose()));
     connect(ui->pushButton_4,SIGNAL(clicked()),SLOT(OnSendGoal()));
+    connect(ui->pushButton_5,SIGNAL(clicked()),SLOT(OnCancelMove()));
     connect(ui->_map_view,SIGNAL(sendGoal()),this,SLOT(OnSendGoal()));
-    connect(ui->pushButton,SIGNAL(clicked()),SLOT(OnActionRobot()));
+
     connect(m_robot_timer,SIGNAL(timeout()), this, SLOT(OnRobotTimer()));
 
 
     memset(&m_robot_status,0,sizeof(STATUS_PACKAGE_ACK));
 
     this->m_socket = new socketThread();
-    socket = NULL;
-    //if(p_socket != NULL)socket = p_socket;
 }
 
 map_main::~map_main()
 {
     delete ui;
-    delete socket;
     delete m_robot_timer;
+}
+
+void map_main::OnActivateNode(std::string str,char enable)
+{
+    if(!this->isActionRobot)return;
+    m_socket->OnActivateNode(str,enable);
+    printf("%s.\n",str.c_str());
 }

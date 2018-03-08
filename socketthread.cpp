@@ -8,6 +8,8 @@ QString sysPort = "8888";
 bool socketThread::isRunOnRobotStatus = false;
 bool socketThread::isRunOnDownloadMap = false;
 bool socketThread::isRunOnSendGoal = false;
+bool socketThread::isRunOnCancelGoal = false;
+bool socketThread::isRunOnActivateNode = false;
 
 int SendSockPackage(QTcpSocket *p_socket,char *buf, int ack_len, char *ack)
 {
@@ -130,7 +132,7 @@ void socketThread::OnDownloadMap(void *data)
     if(!ret)
     {
         printf("succeed!\n");
-        isRunOnDownloadMap = true;
+
     }
     else
     {
@@ -147,7 +149,7 @@ void socketThread::OnRobotStatus(void *data)
     if(!ret)
     {
         //printf("succeed!\n");
-        isRunOnRobotStatus = true;
+
     }
     else
     {
@@ -164,7 +166,7 @@ void socketThread::OnSendGoal(void *data)
     if(!ret)
     {
         //printf("succeed!\n");
-        isRunOnSendGoal = true;
+
     }
     else
     {
@@ -174,13 +176,14 @@ void socketThread::OnSendGoal(void *data)
 
 void *socketThread::SendGoal(void *data)
 {
-
+pthread_detach(pthread_self());
     char pop_buf[80];
     char ack_buf[80];
     map_main *p_map_main = (map_main *)data;
     map_view *p_map_view = (map_view *)(p_map_main->m_map_view_ctl);
     QTcpSocket socket;
     QTcpSocket *p_socket = &socket;
+    isRunOnSendGoal = true;
     if(!connectsocket(p_socket)){
         closesocket(p_socket);
         isRunOnSendGoal = false;
@@ -197,7 +200,7 @@ void *socketThread::SendGoal(void *data)
     pop_buf[1+sizeof(P_HEAD)+sizeof(GOAL_PACKAGE_POP)+1]=0xAB;
     if(p_map_view->getGoalsFromList((ST_POSE*)pop_package,0) > 0)
     {
-        printf("%f %f %f %f\n",pop_package->Quaternion[0],pop_package->Quaternion[1],pop_package->Quaternion[2],pop_package->Quaternion[3]);
+        //printf("%f %f %f %f\n",pop_package->Quaternion[0],pop_package->Quaternion[1],pop_package->Quaternion[2],pop_package->Quaternion[3]);
         if(SendSockPackage(p_socket,pop_buf,sizeof(GOAL_PACKAGE_ACK),ack_buf) == head->funcId)
         {
             printf("Goal send success...\n");
@@ -208,12 +211,119 @@ void *socketThread::SendGoal(void *data)
     return NULL;
 }
 
+void socketThread::OnCancelGoal(void *data)
+{
+    pthread_t id;
+    bool ret;
+
+    ret = pthread_create(&id,NULL,CancelGoal,data);
+    if(!ret)
+    {
+        //printf("succeed!\n");
+
+    }
+    else
+    {
+        printf("Fail to Create Thread.\n");
+    }
+}
+
+void *socketThread::CancelGoal(void *data)
+{
+    pthread_detach(pthread_self());
+    char pop_buf[80];
+    char ack_buf[80];
+
+    //map_main *p_map_main = (map_main *)data;
+    //map_view *p_map_view = (map_view *)(p_map_main->m_map_view_ctl);
+    QTcpSocket socket;
+    QTcpSocket *p_socket = &socket;
+    isRunOnCancelGoal = true;
+    if(!connectsocket(p_socket)){
+        closesocket(p_socket);
+        isRunOnCancelGoal = false;
+        return NULL;
+    }
+    P_HEAD *head = (P_HEAD*)(pop_buf+1);
+    CANCELGOAL_PACKAGE_POP *pop_package = (CANCELGOAL_PACKAGE_POP*)(pop_buf+1+sizeof(P_HEAD));
+    head->funcId = PACK_CANCELGOAL;
+    head->size = sizeof(P_HEAD)+sizeof(CANCELGOAL_PACKAGE_POP);
+    pop_package->isAck = 1;
+
+    pop_buf[0] = 0xAA;
+    pop_buf[1+sizeof(P_HEAD)+sizeof(CANCELGOAL_PACKAGE_POP)+1]=0xAB;
+    if(SendSockPackage(p_socket,pop_buf,sizeof(CANCELGOAL_PACKAGE_ACK),ack_buf) == head->funcId)
+    {
+        printf("Goal cancel success...\n");
+    }
+    closesocket(p_socket);
+    isRunOnCancelGoal = false;
+    return NULL;
+}
+
+void socketThread::OnActivateNode(std::string str,char enable)
+{
+    pthread_t id;
+    bool ret;
+    NODECTL_PACKAGE_POP in_Data = {0};
+    in_Data.enable = enable;
+    if(str.size()>19) return;
+    memcpy(in_Data.node_name,str.c_str(),str.size());
+    ret = pthread_create(&id,NULL,ActivateNode,&in_Data);
+    if(!ret)
+    {
+        //printf("succeed!\n");
+
+    }
+    else
+    {
+        printf("Fail to Create Thread.\n");
+    }
+}
+
+void *socketThread::ActivateNode(void *data)
+{
+    NODECTL_PACKAGE_POP in_Data;
+    memcpy(&in_Data,data,sizeof(NODECTL_PACKAGE_POP));
+    pthread_detach(pthread_self());
+    char pop_buf[80];
+    char ack_buf[80];
+    //map_main *p_map_main = (map_main *)data;
+    //map_view *p_map_view = (map_view *)(p_map_main->m_map_view_ctl);
+    QTcpSocket socket;
+    QTcpSocket *p_socket = &socket;
+
+    isRunOnActivateNode = true;
+    if(!connectsocket(p_socket)){
+        closesocket(p_socket);
+        isRunOnActivateNode = false;
+        return NULL;
+    }
+    P_HEAD *head = (P_HEAD*)(pop_buf+1);
+    NODECTL_PACKAGE_POP *pop_package = (NODECTL_PACKAGE_POP*)(pop_buf+1+sizeof(P_HEAD));
+    head->funcId = PACK_NODECTL;
+    head->size = sizeof(P_HEAD)+sizeof(NODECTL_PACKAGE_POP);
+    memcpy(pop_package,&in_Data,sizeof(NODECTL_PACKAGE_POP));
+
+    pop_buf[0] = 0xAA;
+    pop_buf[1+sizeof(P_HEAD)+sizeof(NODECTL_PACKAGE_POP)+1]=0xAB;
+    if(SendSockPackage(p_socket,pop_buf,sizeof(NODECTL_PACKAGE_ACK),ack_buf) == head->funcId)
+    {
+        printf("Goal cancel success...\n");
+    }
+    closesocket(p_socket);
+    isRunOnActivateNode = false;
+    return NULL;
+}
+
 void* socketThread::RobotStatus(void *data)
 {
+    pthread_detach(pthread_self());
     map_main *p_map_main = (map_main *)data;
     map_view *p_map_view = (map_view *)(p_map_main->m_map_view_ctl);
     QTcpSocket socket;
     QTcpSocket *p_socket = &socket;
+    isRunOnRobotStatus = true;
     if(!connectsocket(p_socket)){
         closesocket(p_socket);
         isRunOnRobotStatus = false;
@@ -276,13 +386,15 @@ void* socketThread::RobotStatus(void *data)
 
 void* socketThread::DownloadMap(void *data)
 {
-
+    pthread_detach(pthread_self());
     char *p = NULL;
     char *pp = NULL;
     map_main *p_map_main = (map_main *)data;
     map_view *p_map_view = (map_view *)(p_map_main->m_map_view_ctl);
     QTcpSocket socket;
     QTcpSocket *p_socket = &socket;
+    if(isRunOnDownloadMap)return NULL;
+    isRunOnDownloadMap = true;
     if(!connectsocket(p_socket)){
         closesocket(p_socket);
         isRunOnDownloadMap = false;
@@ -358,7 +470,7 @@ void* socketThread::DownloadMap(void *data)
         //ui->_map_view->update();
         //QMessageBox::about(this,"Msg","receive success!");
     }
-    if(p != NULL)delete[] p;
+    if(p != NULL)delete [] p;
     isRunOnDownloadMap = false;
     return NULL;
 }

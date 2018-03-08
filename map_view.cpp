@@ -302,7 +302,7 @@ void map_view::paintGL()
            if(*p == 0){
                color = 1.0;
            }else if(*p < 98 && *p > 0){
-               color = (255-*p)/255.0f;
+               color = (127-*p)/127.0f;
            }else if(*p >= 98){
                color = 0.0;
            }else{

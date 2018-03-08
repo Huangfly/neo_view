@@ -5,6 +5,8 @@
 #define PACK_LOGIN		1 //
 #define PACK_MAP        2 //
 #define PACK_GOAL		3 //
+#define PACK_CANCELGOAL	4 //
+#define PACK_NODECTL	5 //
 
 typedef struct {
     float x;
@@ -64,6 +66,23 @@ typedef struct {
 typedef struct {
     char isSuccess;
 }GOAL_PACKAGE_ACK;
+
+typedef struct {
+    char isAck;
+}CANCELGOAL_PACKAGE_POP;
+
+typedef struct {
+    char ack;
+}CANCELGOAL_PACKAGE_ACK;
+
+typedef struct {
+    char enable;//0 enable  1 unable
+    char node_name[20];
+}NODECTL_PACKAGE_POP;
+
+typedef struct {
+    char ack[10];
+}NODECTL_PACKAGE_ACK;
 
 #endif // MAP_SOCKET_TYPE
 

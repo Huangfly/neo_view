@@ -6,6 +6,7 @@
 #include <QtNetwork/QAbstractSocket>
 //#include <Sock>
 #include <QTimer>
+#include <string>
 #include "map_socket_type.h"
 #include "socketthread.h"
 //#include "map_menu.h"
@@ -25,13 +26,14 @@ public slots:
     void OnResetPose();
     void OnLockRot();
     void OnSendGoal();
+    void OnCancelMove();
 
 signals:
     //void SaveMap();
 public:
     explicit map_main(QWidget *parent = 0);
     ~map_main();
-    void OnDownloadMap();
+    void OnActivateNode(std::string str,char enable);
     bool isPatrol();
 
     QString sysIP;
@@ -44,7 +46,6 @@ protected:
 private:
     Ui::map_main *ui;
     socketThread *m_socket;
-    QTcpSocket *socket;
 
     bool isActionRobot;
 };
