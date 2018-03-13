@@ -94,7 +94,7 @@ void map_main::OnCancelMove()
 
 map_main::map_main(QWidget *parent) :
     QWidget(parent),
-    sysIP("192.168.1.56"),
+    sysIP("192.168.0.114"),
     sysPort("8888"),
     ui(new Ui::map_main)
 {

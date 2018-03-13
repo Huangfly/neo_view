@@ -25,12 +25,16 @@ QT_BEGIN_NAMESPACE
 class Ui_map_menu
 {
 public:
+    QWidget *action;
+    QPushButton *action_left;
+    QPushButton *action_right;
+    QPushButton *action_forward;
+    QPushButton *action_back;
     QWidget *navigation;
     QPushButton *PatrolCTL;
     QPushButton *clearGoals;
-    QPushButton *Nav_Mapping;
-    QPushButton *Nav_Navigation;
-    QPushButton *Nav_LidarCtl;
+    QPushButton *Nav_NavigationMode;
+    QPushButton *Nav_ExploreMode;
     QWidget *slam;
     QPushButton *slam_savemap;
     QPushButton *slam_clearMap;
@@ -74,6 +78,77 @@ public:
 "    border-color: rgb(66, 66, 66);\n"
 "    border-top: 2px solid rgb(78, 125, 224);\n"
 "}"));
+        action = new QWidget();
+        action->setObjectName(QStringLiteral("action"));
+        action_left = new QPushButton(action);
+        action_left->setObjectName(QStringLiteral("action_left"));
+        action_left->setGeometry(QRect(20, 15, 40, 40));
+        action_left->setFocusPolicy(Qt::NoFocus);
+        action_left->setStyleSheet(QLatin1String("QPushButton{\n"
+"color:rgb(255, 255, 255);\n"
+"border-radius:10px;\n"
+"background-color:rgb(78, 125, 224);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgb(28, 59, 124);\n"
+"}\n"
+"\n"
+"QPushButton::checked {\n"
+"   background-color: rgb(28, 59, 124);\n"
+"}"));
+        action_right = new QPushButton(action);
+        action_right->setObjectName(QStringLiteral("action_right"));
+        action_right->setGeometry(QRect(100, 15, 40, 40));
+        action_right->setFocusPolicy(Qt::NoFocus);
+        action_right->setStyleSheet(QLatin1String("QPushButton{\n"
+"color:rgb(255, 255, 255);\n"
+"border-radius:10px;\n"
+"background-color:rgb(78, 125, 224);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgb(28, 59, 124);\n"
+"}\n"
+"\n"
+"QPushButton::checked {\n"
+"   background-color: rgb(28, 59, 124);\n"
+"}"));
+        action_forward = new QPushButton(action);
+        action_forward->setObjectName(QStringLiteral("action_forward"));
+        action_forward->setGeometry(QRect(180, 15, 40, 40));
+        action_forward->setFocusPolicy(Qt::NoFocus);
+        action_forward->setStyleSheet(QLatin1String("QPushButton{\n"
+"color:rgb(255, 255, 255);\n"
+"border-radius:10px;\n"
+"background-color:rgb(78, 125, 224);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgb(28, 59, 124);\n"
+"}\n"
+"\n"
+"QPushButton::checked {\n"
+"   background-color: rgb(28, 59, 124);\n"
+"}"));
+        action_back = new QPushButton(action);
+        action_back->setObjectName(QStringLiteral("action_back"));
+        action_back->setGeometry(QRect(260, 15, 40, 40));
+        action_back->setFocusPolicy(Qt::NoFocus);
+        action_back->setStyleSheet(QLatin1String("QPushButton{\n"
+"color:rgb(255, 255, 255);\n"
+"border-radius:10px;\n"
+"background-color:rgb(78, 125, 224);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: rgb(28, 59, 124);\n"
+"}\n"
+"\n"
+"QPushButton::checked {\n"
+"   background-color: rgb(28, 59, 124);\n"
+"}"));
+        map_menu->addTab(action, QString());
         navigation = new QWidget();
         navigation->setObjectName(QStringLiteral("navigation"));
         PatrolCTL = new QPushButton(navigation);
@@ -96,7 +171,7 @@ public:
         PatrolCTL->setCheckable(true);
         clearGoals = new QPushButton(navigation);
         clearGoals->setObjectName(QStringLiteral("clearGoals"));
-        clearGoals->setGeometry(QRect(420, 15, 80, 40));
+        clearGoals->setGeometry(QRect(320, 15, 80, 40));
         clearGoals->setFocusPolicy(Qt::NoFocus);
         clearGoals->setStyleSheet(QLatin1String("QPushButton{\n"
 "color:rgb(255, 255, 255);\n"
@@ -111,11 +186,11 @@ public:
 "QPushButton::checked {\n"
 "   background-color: rgb(28, 59, 124);\n"
 "}"));
-        Nav_Mapping = new QPushButton(navigation);
-        Nav_Mapping->setObjectName(QStringLiteral("Nav_Mapping"));
-        Nav_Mapping->setGeometry(QRect(120, 15, 80, 40));
-        Nav_Mapping->setFocusPolicy(Qt::NoFocus);
-        Nav_Mapping->setStyleSheet(QLatin1String("QPushButton{\n"
+        Nav_NavigationMode = new QPushButton(navigation);
+        Nav_NavigationMode->setObjectName(QStringLiteral("Nav_NavigationMode"));
+        Nav_NavigationMode->setGeometry(QRect(120, 15, 80, 40));
+        Nav_NavigationMode->setFocusPolicy(Qt::NoFocus);
+        Nav_NavigationMode->setStyleSheet(QLatin1String("QPushButton{\n"
 "color:rgb(255, 255, 255);\n"
 "border-radius:10px;\n"
 "background-color:rgb(78, 125, 224);\n"
@@ -128,12 +203,12 @@ public:
 "QPushButton::checked {\n"
 "   background-color: rgb(28, 59, 124);\n"
 "}"));
-        Nav_Mapping->setCheckable(true);
-        Nav_Navigation = new QPushButton(navigation);
-        Nav_Navigation->setObjectName(QStringLiteral("Nav_Navigation"));
-        Nav_Navigation->setGeometry(QRect(220, 15, 80, 40));
-        Nav_Navigation->setFocusPolicy(Qt::NoFocus);
-        Nav_Navigation->setStyleSheet(QLatin1String("QPushButton{\n"
+        Nav_NavigationMode->setCheckable(true);
+        Nav_ExploreMode = new QPushButton(navigation);
+        Nav_ExploreMode->setObjectName(QStringLiteral("Nav_ExploreMode"));
+        Nav_ExploreMode->setGeometry(QRect(220, 15, 80, 40));
+        Nav_ExploreMode->setFocusPolicy(Qt::NoFocus);
+        Nav_ExploreMode->setStyleSheet(QLatin1String("QPushButton{\n"
 "color:rgb(255, 255, 255);\n"
 "border-radius:10px;\n"
 "background-color:rgb(78, 125, 224);\n"
@@ -146,25 +221,7 @@ public:
 "QPushButton::checked {\n"
 "   background-color: rgb(28, 59, 124);\n"
 "}"));
-        Nav_Navigation->setCheckable(true);
-        Nav_LidarCtl = new QPushButton(navigation);
-        Nav_LidarCtl->setObjectName(QStringLiteral("Nav_LidarCtl"));
-        Nav_LidarCtl->setGeometry(QRect(320, 15, 80, 40));
-        Nav_LidarCtl->setFocusPolicy(Qt::NoFocus);
-        Nav_LidarCtl->setStyleSheet(QLatin1String("QPushButton{\n"
-"color:rgb(255, 255, 255);\n"
-"border-radius:10px;\n"
-"background-color:rgb(78, 125, 224);\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: rgb(28, 59, 124);\n"
-"}\n"
-"\n"
-"QPushButton::checked {\n"
-"   background-color: rgb(28, 59, 124);\n"
-"}"));
-        Nav_LidarCtl->setCheckable(true);
+        Nav_ExploreMode->setCheckable(true);
         map_menu->addTab(navigation, QString());
         slam = new QWidget();
         slam->setObjectName(QStringLiteral("slam"));
@@ -252,7 +309,7 @@ public:
 
         retranslateUi(map_menu);
 
-        map_menu->setCurrentIndex(0);
+        map_menu->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(map_menu);
@@ -261,13 +318,17 @@ public:
     void retranslateUi(QTabWidget *map_menu)
     {
         map_menu->setWindowTitle(QApplication::translate("map_menu", "TabWidget", 0));
+        action_left->setText(QApplication::translate("map_menu", "<-", 0));
+        action_right->setText(QApplication::translate("map_menu", "->", 0));
+        action_forward->setText(QApplication::translate("map_menu", "^", 0));
+        action_back->setText(QApplication::translate("map_menu", "v", 0));
+        map_menu->setTabText(map_menu->indexOf(action), QApplication::translate("map_menu", "Action", 0));
         PatrolCTL->setText(QApplication::translate("map_menu", "Patrol\n"
 "off", 0));
         clearGoals->setText(QApplication::translate("map_menu", "Clear\n"
 "Goals", 0));
-        Nav_Mapping->setText(QApplication::translate("map_menu", "MAPPING", 0));
-        Nav_Navigation->setText(QApplication::translate("map_menu", "NAV", 0));
-        Nav_LidarCtl->setText(QApplication::translate("map_menu", "LIDAR", 0));
+        Nav_NavigationMode->setText(QApplication::translate("map_menu", "Navigation", 0));
+        Nav_ExploreMode->setText(QApplication::translate("map_menu", "Explore", 0));
         map_menu->setTabText(map_menu->indexOf(navigation), QApplication::translate("map_menu", "Navigation", 0));
         slam_savemap->setText(QApplication::translate("map_menu", "Save Map", 0));
         slam_clearMap->setText(QApplication::translate("map_menu", "Clear\n"

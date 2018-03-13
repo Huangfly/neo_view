@@ -24,12 +24,20 @@ void map_menu::OnPatrol()
 
 void map_menu::OnNav_NavigationMode()
 {
-
+    if(ui->Nav_NavigationMode->isChecked()){
+        m_map_main_ctl->OnActivateNode("navigation",1);
+    }else{
+        m_map_main_ctl->OnActivateNode("navigation",0);
+    }
 }
 
 void map_menu::OnNav_ExploreMode()
 {
-
+    if(ui->Nav_ExploreMode->isChecked()){
+        m_map_main_ctl->OnActivateNode("explore",1);
+    }else{
+        m_map_main_ctl->OnActivateNode("explore",0);
+    }
 }
 
 
@@ -79,7 +87,7 @@ map_menu::map_menu(QWidget *parent) :
 
 
     connect(ui->PatrolCTL,SIGNAL(clicked()),this,SLOT(OnPatrol()));
-    connect(ui->Nav_NavigationMode,SIGNAL(clicked()),this,SLOT(OnNav_NavitionMode()));
+    connect(ui->Nav_NavigationMode,SIGNAL(clicked()),this,SLOT(OnNav_NavigationMode()));
     connect(ui->Nav_ExploreMode,SIGNAL(clicked()),this,SLOT(OnNav_ExploreMode()));
     connect(ui->clearGoals,SIGNAL(clicked()),this,SLOT(OnClearGoals()));
 
