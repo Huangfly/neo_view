@@ -16,8 +16,8 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
-#include <map_menu.h>
-#include <map_view.h>
+#include <src/map_menu.h>
+#include <src/map_view.h>
 
 QT_BEGIN_NAMESPACE
 

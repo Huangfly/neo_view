@@ -12,18 +12,22 @@ TARGET = neo_view
 TEMPLATE = app
 LIBS += -lGLU
 
-SOURCES += main.cpp\
-        map_view.cpp \
-    map_menu.cpp \
-    map_main.cpp \
-    socketthread.cpp
+SOURCES += socket/CThreadBase.cpp \
+    socket/CThreadPool.cpp \
+    src/main.cpp \
+    src/map_main.cpp \
+    src/map_menu.cpp \
+    src/map_view.cpp \
+    src/socketthread.cpp
 
-HEADERS  += map_view.h \
-    map_menu.h \
-    map_main.h \
-    map_socket_type.h \
-    socketthread.h
+HEADERS  += socket/CThreadBase.h \
+    socket/CThreadPool.h \
+    src/map_main.h \
+    src/map_menu.h \
+    src/map_socket_type.h \
+    src/map_view.h \
+    src/socketthread.h
 
-FORMS    += map_view.ui \
-    map_menu.ui \
-    map_main.ui
+FORMS    += ui/map_view.ui \
+    ui/map_menu.ui \
+    ui/map_main.ui
