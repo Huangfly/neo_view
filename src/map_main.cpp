@@ -22,9 +22,21 @@ bool map_main::isPatrol()
     return ui->_map_menu->isPatrol;
 }
 
+void map_main::actionRobot()
+{
+    this->isActionRobot = true;
+    this->m_robot_timer->start(200);
+}
+
+void map_main::lockRobot()
+{
+    this->isActionRobot = false;
+    this->m_robot_timer->stop();
+}
+
 void map_main::OnActionRobot()
 {
-    if(this->isActionRobot)
+  /*  if(this->isActionRobot)
     {
         //if(!closesocket())return;
         ui->pushButton->setText("Action Robot");
@@ -38,23 +50,23 @@ void map_main::OnActionRobot()
         this->isActionRobot = true;
         this->m_robot_timer->start(200);
     }
-    this->update();
+    this->update();*/
 }
 
 
 void map_main::OnRobotTimer()
 {
+    if(!isActionRobot)return;
     if(m_robot_status.updateMap)
     {
         if(!socketThread::isRunOnDownloadMap)
         {
             m_socket->OnDownloadMap(this);
         }
-    }
-    else
-    {
-        if(!socketThread::isRunOnRobotStatus)
-            m_socket->OnRobotStatus(this);
+    }else{
+
+    if(!socketThread::isRunOnRobotStatus)
+        m_socket->OnRobotStatus(this);
     }
 }
 
@@ -94,7 +106,7 @@ void map_main::OnCancelMove()
 
 map_main::map_main(QWidget *parent) :
     QWidget(parent),
-    sysIP("192.168.0.114"),
+    sysIP("192.168.1.121"),
     sysPort("8888"),
     ui(new Ui::map_main)
 {
@@ -122,6 +134,7 @@ map_main::map_main(QWidget *parent) :
     memset(&m_robot_status,0,sizeof(STATUS_PACKAGE_ACK));
 
     this->m_socket = new socketThread();
+    //this->m_robot_timer->start(1);
 }
 
 map_main::~map_main()
@@ -134,5 +147,5 @@ void map_main::OnActivateNode(std::string str,char enable)
 {
     if(!this->isActionRobot)return;
     m_socket->OnActivateNode(str,enable);
-    printf("%s.\n",str.c_str());
+    //printf("%s.\n",str.c_str());
 }

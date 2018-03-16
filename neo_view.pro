@@ -14,20 +14,30 @@ LIBS += -lGLU
 
 SOURCES += socket/CThreadBase.cpp \
     socket/CThreadPool.cpp \
+    socket/CSocket.cpp \
+    socket/CTcpSocket.cpp \
+    socket/CUdpSocket.cpp \
+    socket/CStreamBase.cpp \
     src/main.cpp \
     src/map_main.cpp \
     src/map_menu.cpp \
     src/map_view.cpp \
-    src/socketthread.cpp
+    src/socketthread.cpp \
+    socket/CHostAddr.cpp
 
 HEADERS  += socket/CThreadBase.h \
     socket/CThreadPool.h \
+    socket/CSocket.h \
+    socket/CTcpSocket.h \
+    socket/CUdpSocket.h \
+    socket/CStreamBase.h \
     src/map_main.h \
     src/map_menu.h \
     src/map_socket_type.h \
     src/map_view.h \
-    src/socketthread.h
+    src/socketthread.h \
+    socket/CHostAddr.h
 
-FORMS    += ui/map_view.ui \
-    ui/map_menu.ui \
-    ui/map_main.ui
+FORMS    += src/map_view.ui \
+    src/map_menu.ui \
+    src/map_main.ui

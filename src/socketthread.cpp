@@ -1,15 +1,22 @@
 #include "socketthread.h"
 #include "map_main.h"
 #include "map_view.h"
+#include "socket/CTcpSocket.h"
 
 QTcpSocket *pt_socket = NULL;
-QString sysIP = "192.168.1.56";
+QString sysIP = "192.168.1.121";
 QString sysPort = "8888";
 bool socketThread::isRunOnRobotStatus = false;
 bool socketThread::isRunOnDownloadMap = false;
 bool socketThread::isRunOnSendGoal = false;
 bool socketThread::isRunOnCancelGoal = false;
 bool socketThread::isRunOnActivateNode = false;
+
+char *map_Data = NULL;
+unsigned long map_Data_len = 0;
+pthread_mutex_t mutex_socket;
+pthread_mutex_t mutex_rosbotstatus;
+pthread_mutex_t mutex_nodeaction;
 
 int SendSockPackage(QTcpSocket *p_socket,char *buf, int ack_len, char *ack)
 {
@@ -122,6 +129,11 @@ socketThread::socketThread()
     //if(p_socket == NULL)
     //    p_socket = new QTcpSocket(this);// the end of process was delete
     isRunOnRobotStatus = false;
+    //this->map_Data = NULL;
+    //map_Data_len = 0;
+    pthread_mutex_init(&mutex_rosbotstatus,NULL);
+    pthread_mutex_init(&mutex_nodeaction,NULL);
+    pthread_mutex_init(&mutex_socket,NULL);
 }
 
 void socketThread::OnDownloadMap(void *data)
@@ -265,10 +277,13 @@ void socketThread::OnActivateNode(std::string str,char enable)
 {
     pthread_t id;
     bool ret;
-    NODECTL_PACKAGE_POP in_Data = {0};
+    NODECTL_PACKAGE_POP in_Data;
+    memset(in_Data.node_name,0,sizeof(in_Data.node_name));
     in_Data.enable = enable;
     if(str.size()>19) return;
     memcpy(in_Data.node_name,str.c_str(),str.size());
+    printf("%s\n",in_Data.node_name);
+    pthread_mutex_lock(&mutex_nodeaction);
     ret = pthread_create(&id,NULL,ActivateNode,&in_Data);
     if(!ret)
     {
@@ -279,12 +294,17 @@ void socketThread::OnActivateNode(std::string str,char enable)
     {
         printf("Fail to Create Thread.\n");
     }
+    pthread_mutex_lock(&mutex_nodeaction);
+    pthread_mutex_unlock(&mutex_nodeaction);
 }
 
 void *socketThread::ActivateNode(void *data)
 {
     NODECTL_PACKAGE_POP in_Data;
+
     memcpy(&in_Data,data,sizeof(NODECTL_PACKAGE_POP));
+    pthread_mutex_unlock(&mutex_nodeaction);
+
     pthread_detach(pthread_self());
     char pop_buf[80];
     char ack_buf[80];
@@ -319,65 +339,81 @@ void *socketThread::ActivateNode(void *data)
 void* socketThread::RobotStatus(void *data)
 {
     pthread_detach(pthread_self());
+    pthread_mutex_lock(&mutex_rosbotstatus);
     map_main *p_map_main = (map_main *)data;
     map_view *p_map_view = (map_view *)(p_map_main->m_map_view_ctl);
-    QTcpSocket socket;
-    QTcpSocket *p_socket = &socket;
-    isRunOnRobotStatus = true;
-    if(!connectsocket(p_socket)){
+    do{
+        QTcpSocket socket;
+        QTcpSocket *p_socket = &socket;
+        isRunOnRobotStatus = true;
+        if(!connectsocket(p_socket)){
+            closesocket(p_socket);
+            break;
+        }
+        /*p_socket->connectToHost(sysIP,sysPort.toInt(),QTcpSocket::ReadWrite);
+        if(!p_socket->waitForConnected(2000)){
+            isRunOnRobotStatus = false;
+            closesocket(p_socket);
+            return NULL;
+        }*/
+
+        char pop_buf[50] = {0};
+        char ack_buf[600] = {0};
+        P_HEAD *head = (P_HEAD*)(pop_buf+1);
+        STATUS_PACKAGE_POP *pop_package = (STATUS_PACKAGE_POP*)(pop_buf+1+sizeof(P_HEAD));
+        P_HEAD *ackhead = (P_HEAD*)(ack_buf+1);
+        STATUS_PACKAGE_ACK *ack_package = (STATUS_PACKAGE_ACK*)(ack_buf+1+sizeof(P_HEAD));
+        head->funcId = PACK_HEARD;
+        head->size = sizeof(P_HEAD)+sizeof(STATUS_PACKAGE_POP);
+        pop_package->isAck = 1;
+        pop_buf[0] = 0xAA;
+        pop_buf[1+sizeof(P_HEAD)+sizeof(STATUS_PACKAGE_POP)+1]=0xAB;
+
+       /* int ret = 0;
+        if((ret = SendSockPackage(p_socket,pop_buf,sizeof(STATUS_PACKAGE_ACK),ack_buf)) == head->funcId)
+        {
+            printf("Goal cancel success...\n");
+        }*/
+
+        //sleep(1);
+        //printf("send : \n id:%d  size:%d\n",head->funcId,head->size);
+        //printf("sum:%d num:%d\n",map_pop->package_sum,map_pop->package_num);
+
+        p_socket->write((char*)pop_buf,head->size+3);
+        if(!p_socket->waitForBytesWritten()){
+            printf("send() error\n");
+            isRunOnRobotStatus = false;
+            closesocket(p_socket);
+            break;
+        }
+        //sleep(1);
+        //printf("wait ack...\n");
+        int ret = 0;
+        bool result = false;
+        result = p_socket->waitForReadyRead(2000);
+
+        if(!result || (ret=p_socket->read((char*)ack_buf,(1+sizeof(P_HEAD)+sizeof(STATUS_PACKAGE_ACK)+1+1))) == -1) {
+            printf("recv(%d) error\n",ack_package->updateMap);
+            isRunOnRobotStatus = false;
+            closesocket(p_socket);
+            break;
+        }
         closesocket(p_socket);
-        isRunOnRobotStatus = false;
-        return NULL;
-    }
-    unsigned char str[50] = {0};
-    unsigned char ack[600] = {0};
-    P_HEAD *head = (P_HEAD*)(str+1);
-    STATUS_PACKAGE_POP *pop_package = (STATUS_PACKAGE_POP*)(str+1+sizeof(P_HEAD));
-    P_HEAD *ackhead = (P_HEAD*)(ack+1);
-    STATUS_PACKAGE_ACK *ack_package = (STATUS_PACKAGE_ACK*)(ack+1+sizeof(P_HEAD));
-    head->funcId = PACK_HEARD;
-    head->size = sizeof(P_HEAD)+sizeof(STATUS_PACKAGE_POP);
-    pop_package->isAck = 1;
-    str[0] = 0xAA;
-    str[1+sizeof(P_HEAD)+sizeof(STATUS_PACKAGE_POP)+1]=0xAB;
-
-    //sleep(1);
-    //printf("send : \n id:%d  size:%d\n",head->funcId,head->size);
-    //printf("sum:%d num:%d\n",map_pop->package_sum,map_pop->package_num);
-    p_socket->write((char*)str,head->size+3);
-    if(!p_socket->waitForBytesWritten()){
-        printf("send() error\n");
-        isRunOnRobotStatus = false;
-        closesocket(p_socket);
-        return NULL;
-    }
-
-    //printf("wait ack...\n");
-    int ret = 0;
-    bool result = false;
-    result = p_socket->waitForReadyRead(5000);
-
-    if(!result || (ret=p_socket->read((char*)ack,(1+sizeof(P_HEAD)+sizeof(STATUS_PACKAGE_ACK)+1+1))) == -1) {
-        printf("recv() error\n");
-        isRunOnRobotStatus = false;
-        closesocket(p_socket);
-        return NULL;
-    }
-    closesocket(p_socket);
-    if(ackhead->funcId == PACK_HEARD )
-    {
-        printf("recv() success\n");
-        memcpy(&p_map_main->m_robot_status,ack_package,sizeof(STATUS_PACKAGE_ACK));
-
-        p_map_view->updateRobotPose(p_map_main->m_robot_status);
-        p_map_view->emitUpdateUI();
-    }
-    else
-    {
-        printf("ack fail.\n");
-        //return NULL;
-    }
+        if(ackhead->funcId == PACK_HEARD && ret>=0)
+        {
+            printf("recv(%d) success\n",ack_package->updateMap);
+            memcpy(&p_map_main->m_robot_status,ack_package,sizeof(STATUS_PACKAGE_ACK));
+            p_map_view->updateRobotPose(p_map_main->m_robot_status);
+            p_map_view->emitUpdateUI();
+        }
+        else
+        {
+            printf("ack fail.\n");
+            //return NULL;
+        }
+    }while(0);
     isRunOnRobotStatus = false;
+    pthread_mutex_unlock(&mutex_rosbotstatus);
     return NULL;
 }
 
@@ -387,8 +423,9 @@ void* socketThread::RobotStatus(void *data)
 void* socketThread::DownloadMap(void *data)
 {
     pthread_detach(pthread_self());
-    char *p = NULL;
-    char *pp = NULL;
+    pthread_mutex_lock(&mutex_socket);
+    //char *p = NULL;
+    char *pp = map_Data;
     map_main *p_map_main = (map_main *)data;
     map_view *p_map_view = (map_view *)(p_map_main->m_map_view_ctl);
     QTcpSocket socket;
@@ -401,7 +438,7 @@ void* socketThread::DownloadMap(void *data)
         return NULL;
     }
     unsigned char str[50] = {0};
-    unsigned char ack[600] = {0};
+    unsigned char ack[800] = {0};
     P_HEAD *head = (P_HEAD*)(str+1);
     MAP_PACKAGE_POP *map_pop = (MAP_PACKAGE_POP*)(str+1+16);
     P_HEAD *ackhead = (P_HEAD*)(ack+1);
@@ -417,6 +454,7 @@ void* socketThread::DownloadMap(void *data)
         //sleep(1);
         //printf("send : \n id:%d  size:%d\n",head->funcId,head->size);
         //printf("sum:%d num:%d\n",map_pop->package_sum,map_pop->package_num);
+
         p_socket->write((char*)str,head->size+9);
         if(!p_socket->waitForBytesWritten()){
             printf("send() error\n");
@@ -435,13 +473,15 @@ void* socketThread::DownloadMap(void *data)
         if(ackhead->funcId == PACK_MAP )
         {
 
-            //printf("ack sum:%d num:%d\n",map_ack->package_sum,map_ack->package_num);
+            printf("ack sum:%d num:%d\n",map_ack->package_sum,map_ack->package_num);
             map_pop->package_sum = map_ack->package_sum;
             map_pop->package_num = map_ack->package_num;
             //num = 0;
 
-            if(p==NULL && map_ack->package_num){
-                pp = p = new char[map_ack->package_sum*512];
+            if( map_Data_len <  (map_ack->package_sum*512) ){
+                if(map_Data != NULL) delete [] map_Data;
+                pp = map_Data = new char[map_ack->package_sum*512+10];
+                map_Data_len = map_ack->package_sum*512;
             }
             memcpy(pp,map_ack->data,512);
             pp += 512;
@@ -455,22 +495,23 @@ void* socketThread::DownloadMap(void *data)
             printf("ack fail.\n");
             break;
         }
-
+        //closesocket(p_socket);
     }while(map_pop->package_sum != 0 && map_pop->package_sum >= map_ack->package_num);
-    printf("ack w:%d h:%d size:%d recv:%d\n",map_ack->width,map_ack->hight,map_ack->size,(int)(pp-p));
+    printf("ack w:%d h:%d size:%d recv:%d\n",map_ack->width,map_ack->hight,map_ack->size,(int)(pp-map_Data));
     printf("ack x:%f y:%f \n",map_ack->x,map_ack->y);
 
     closesocket(p_socket);
+    pthread_mutex_unlock(&mutex_socket);
     if(map_ack->package_sum != 0 && map_ack->package_sum == map_ack->package_num)
     {
 
-        p_map_view->updateMap(p,map_ack->width,map_ack->hight,map_ack->resolution,*(ST_POSE*)(&map_ack->x));
+        p_map_view->updateMap(map_Data,map_ack->width,map_ack->hight,map_ack->resolution,*(ST_POSE*)(&map_ack->x));
         p_map_view->emitUpdateUI();
         p_map_main->m_robot_status.updateMap = 0;
         //ui->_map_view->update();
         //QMessageBox::about(this,"Msg","receive success!");
     }
-    if(p != NULL)delete [] p;
+    //if(p != NULL)delete [] p;
     isRunOnDownloadMap = false;
     return NULL;
 }

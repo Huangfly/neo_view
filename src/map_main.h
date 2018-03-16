@@ -35,6 +35,8 @@ public:
     ~map_main();
     void OnActivateNode(std::string str,char enable);
     bool isPatrol();
+    void actionRobot();
+    void lockRobot();
 
     QString sysIP;
     QString sysPort;

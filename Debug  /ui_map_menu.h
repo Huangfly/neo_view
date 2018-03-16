@@ -309,7 +309,7 @@ public:
 
         retranslateUi(map_menu);
 
-        map_menu->setCurrentIndex(1);
+        map_menu->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(map_menu);

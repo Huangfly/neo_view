@@ -25,17 +25,26 @@ void map_menu::OnPatrol()
 void map_menu::OnNav_NavigationMode()
 {
     if(ui->Nav_NavigationMode->isChecked()){
-        m_map_main_ctl->OnActivateNode("navigation",1);
+        if(!ui->Nav_ExploreMode->isChecked()){
+            m_map_main_ctl->actionRobot();
+            m_map_main_ctl->OnActivateNode("navigation",1);
+        }else{
+            ui->Nav_NavigationMode->setChecked(false);
+        }
+
     }else{
         m_map_main_ctl->OnActivateNode("navigation",0);
+        m_map_main_ctl->lockRobot();
     }
 }
 
 void map_menu::OnNav_ExploreMode()
 {
-    if(ui->Nav_ExploreMode->isChecked()){
+    if(ui->Nav_ExploreMode->isChecked()
+        && ui->Nav_NavigationMode->isChecked()){
         m_map_main_ctl->OnActivateNode("explore",1);
     }else{
+        ui->Nav_ExploreMode->setChecked(false);
         m_map_main_ctl->OnActivateNode("explore",0);
     }
 }

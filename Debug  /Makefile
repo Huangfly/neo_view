@@ -50,21 +50,31 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../socket/CThreadBase.cpp \
 		../socket/CThreadPool.cpp \
+		../socket/CSocket.cpp \
+		../socket/CTcpSocket.cpp \
+		../socket/CUdpSocket.cpp \
+		../socket/CStreamBase.cpp \
 		../src/main.cpp \
 		../src/map_main.cpp \
 		../src/map_menu.cpp \
 		../src/map_view.cpp \
-		../src/socketthread.cpp moc_map_main.cpp \
+		../src/socketthread.cpp \
+		../socket/CHostAddr.cpp moc_map_main.cpp \
 		moc_map_menu.cpp \
 		moc_map_view.cpp \
 		moc_socketthread.cpp
 OBJECTS       = CThreadBase.o \
 		CThreadPool.o \
+		CSocket.o \
+		CTcpSocket.o \
+		CUdpSocket.o \
+		CStreamBase.o \
 		main.o \
 		map_main.o \
 		map_menu.o \
 		map_view.o \
 		socketthread.o \
+		CHostAddr.o \
 		moc_map_main.o \
 		moc_map_menu.o \
 		moc_map_view.o \
@@ -205,17 +215,27 @@ DIST          = /opt/Qt5.5.1/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt5.5.1/5.5/gcc_64/mkspecs/features/lex.prf \
 		../../neo_view.pro ../socket/CThreadBase.h \
 		../socket/CThreadPool.h \
+		../socket/CSocket.h \
+		../socket/CTcpSocket.h \
+		../socket/CUdpSocket.h \
+		../socket/CStreamBase.h \
 		../src/map_main.h \
 		../src/map_menu.h \
 		../src/map_socket_type.h \
 		../src/map_view.h \
-		../src/socketthread.h ../socket/CThreadBase.cpp \
+		../src/socketthread.h \
+		../socket/CHostAddr.h ../socket/CThreadBase.cpp \
 		../socket/CThreadPool.cpp \
+		../socket/CSocket.cpp \
+		../socket/CTcpSocket.cpp \
+		../socket/CUdpSocket.cpp \
+		../socket/CStreamBase.cpp \
 		../src/main.cpp \
 		../src/map_main.cpp \
 		../src/map_menu.cpp \
 		../src/map_view.cpp \
-		../src/socketthread.cpp
+		../src/socketthread.cpp \
+		../socket/CHostAddr.cpp
 QMAKE_TARGET  = neo_view
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = neo_view
@@ -541,9 +561,9 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../socket/CThreadBase.h ../socket/CThreadPool.h ../src/map_main.h ../src/map_menu.h ../src/map_socket_type.h ../src/map_view.h ../src/socketthread.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../socket/CThreadBase.cpp ../socket/CThreadPool.cpp ../src/main.cpp ../src/map_main.cpp ../src/map_menu.cpp ../src/map_view.cpp ../src/socketthread.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../ui/map_view.ui ../ui/map_menu.ui ../ui/map_main.ui $(DISTDIR)/
+	$(COPY_FILE) --parents ../socket/CThreadBase.h ../socket/CThreadPool.h ../socket/CSocket.h ../socket/CTcpSocket.h ../socket/CUdpSocket.h ../socket/CStreamBase.h ../src/map_main.h ../src/map_menu.h ../src/map_socket_type.h ../src/map_view.h ../src/socketthread.h ../socket/CHostAddr.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../socket/CThreadBase.cpp ../socket/CThreadPool.cpp ../socket/CSocket.cpp ../socket/CTcpSocket.cpp ../socket/CUdpSocket.cpp ../socket/CStreamBase.cpp ../src/main.cpp ../src/map_main.cpp ../src/map_menu.cpp ../src/map_view.cpp ../src/socketthread.cpp ../socket/CHostAddr.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../src/map_view.ui ../src/map_menu.ui ../src/map_main.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1016,14 +1036,14 @@ compiler_moc_source_clean:
 compiler_uic_make_all: ui_map_view.h ui_map_menu.h ui_map_main.h
 compiler_uic_clean:
 	-$(DEL_FILE) ui_map_view.h ui_map_menu.h ui_map_main.h
-ui_map_view.h: ../ui/map_view.ui
-	/opt/Qt5.5.1/5.5/gcc_64/bin/uic ../ui/map_view.ui -o ui_map_view.h
+ui_map_view.h: ../src/map_view.ui
+	/opt/Qt5.5.1/5.5/gcc_64/bin/uic ../src/map_view.ui -o ui_map_view.h
 
-ui_map_menu.h: ../ui/map_menu.ui
-	/opt/Qt5.5.1/5.5/gcc_64/bin/uic ../ui/map_menu.ui -o ui_map_menu.h
+ui_map_menu.h: ../src/map_menu.ui
+	/opt/Qt5.5.1/5.5/gcc_64/bin/uic ../src/map_menu.ui -o ui_map_menu.h
 
-ui_map_main.h: ../ui/map_main.ui
-	/opt/Qt5.5.1/5.5/gcc_64/bin/uic ../ui/map_main.ui -o ui_map_main.h
+ui_map_main.h: ../src/map_main.ui
+	/opt/Qt5.5.1/5.5/gcc_64/bin/uic ../src/map_main.ui -o ui_map_main.h
 
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
@@ -1040,6 +1060,27 @@ CThreadBase.o: ../socket/CThreadBase.cpp ../socket/CThreadBase.h
 
 CThreadPool.o: ../socket/CThreadPool.cpp ../socket/CThreadPool.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CThreadPool.o ../socket/CThreadPool.cpp
+
+CSocket.o: ../socket/CSocket.cpp ../socket/CSocket.h \
+		../socket/CStreamBase.h \
+		../socket/CHostAddr.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CSocket.o ../socket/CSocket.cpp
+
+CTcpSocket.o: ../socket/CTcpSocket.cpp ../socket/CTcpSocket.h \
+		../socket/CSocket.h \
+		../socket/CStreamBase.h \
+		../socket/CHostAddr.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CTcpSocket.o ../socket/CTcpSocket.cpp
+
+CUdpSocket.o: ../socket/CUdpSocket.cpp ../socket/CUdpSocket.h \
+		../socket/CSocket.h \
+		../socket/CStreamBase.h \
+		../socket/CHostAddr.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CUdpSocket.o ../socket/CUdpSocket.cpp
+
+CStreamBase.o: ../socket/CStreamBase.cpp ../socket/CStreamBase.h \
+		../socket/CHostAddr.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CStreamBase.o ../socket/CStreamBase.cpp
 
 main.o: ../src/main.cpp ../src/map_main.h \
 		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/QWidget \
@@ -1316,21 +1357,6 @@ map_main.o: ../src/map_main.cpp ../src/map_main.h \
 		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/QPushButton \
 		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/qpushbutton.h \
 		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
-		../src/map_menu.h \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/QTabWidget \
-		../src/map_view.h \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/QOpenGLWidget \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/qopenglwidget.h \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtGui/QSurfaceFormat \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtGui/qsurfaceformat.h \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtGui/qopengl.h \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtCore/qt_windows.h \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtGui/qopengles2ext.h \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtGui/qopenglext.h \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtCore/QFile \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/QLabel \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/qlabel.h \
-		/opt/Qt5.5.1/5.5/gcc_64/include/QtGui/QKeyEvent \
 		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/QMessageBox \
 		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/qmessagebox.h \
 		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/qdialog.h
@@ -1805,6 +1831,9 @@ socketthread.o: ../src/socketthread.cpp ../src/socketthread.h \
 		/opt/Qt5.5.1/5.5/gcc_64/include/QtWidgets/qframe.h \
 		/opt/Qt5.5.1/5.5/gcc_64/include/QtGui/QKeyEvent
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o socketthread.o ../src/socketthread.cpp
+
+CHostAddr.o: ../socket/CHostAddr.cpp ../socket/CHostAddr.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CHostAddr.o ../socket/CHostAddr.cpp
 
 moc_map_main.o: moc_map_main.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_map_main.o moc_map_main.cpp

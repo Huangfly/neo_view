@@ -315,9 +315,11 @@ void map_view::paintGL()
     }
     glFlush();
     //------Pose------
+    float aaa[4] = {0.0,0.0,0.0,1.0};
     if(map_width > 0)
     {
         setStaticPose(0.3,   1.0,0.0,0.0);
+
         setPose(this->robotPose.x,robotPose.y,robotPose.z + 0.001111f,   0.3,   0.0,0.0,1.0,  this->robotPose.Quaternion);
     }
     //------Label------
@@ -501,8 +503,8 @@ void map_view::updateRobotPose(STATUS_PACKAGE_ACK pose)
 {
     // reached Goal?
 
-    if( calc_distance(m_goals.begin()->x - pose.x, m_goals.begin()->y - pose.y) < 0.2f ){
-        if(!main_view_ctl->isPatrol()) {
+    if( calc_distance(m_goals.begin()->x - pose.x, m_goals.begin()->y - pose.y) < 0.4f ){
+        if(!main_view_ctl->isPatrol() || m_goals.size() < 2) {
             clearFrontGoals();
         }else{
             resetNextGoal();
