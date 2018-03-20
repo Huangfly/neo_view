@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>logo.ico</file>
+        <file>down.png</file>
+        <file>down_press.png</file>
+        <file>left.png</file>
+        <file>left_press.png</file>
+        <file>right.png</file>
+        <file>right_press.png</file>
+        <file>up.png</file>
+        <file>up_press.png</file>
+    </qresource>
+</RCC>

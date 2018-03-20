@@ -79,6 +79,59 @@ void map_menu::OnSlam_ClearMap()
     this->m_map_view_ctl->clearMap();
 }
 
+
+void map_menu::OnAction_BtnPress()
+{
+    QPushButton* btn = qobject_cast<QPushButton*>(sender());
+    printf("%s  %d\n",btn->objectName().toStdString().c_str(),btn->isChecked());
+    m_cmdvel_timer->disconnect(this);
+    m_cmdvel_timer->stop();
+
+
+    //disconnect(m_cmdvel_timer,SIGNAL(timeout()),this);
+    if(btn->objectName() == ui->action_left->objectName()){
+        connect(m_cmdvel_timer,SIGNAL(timeout()),this,SLOT(OnAction_Left()));
+        m_cmdvel_timer->start(200);
+    }else if(btn->objectName() == ui->action_right->objectName()){
+        connect(m_cmdvel_timer,SIGNAL(timeout()),this,SLOT(OnAction_Right()));
+        m_cmdvel_timer->start(200);
+    }else if(btn->objectName() == ui->action_forward->objectName()){
+        connect(m_cmdvel_timer,SIGNAL(timeout()),this,SLOT(OnAction_Forward()));
+        m_cmdvel_timer->start(200);
+    }else if(btn->objectName() == ui->action_back->objectName()){
+        connect(m_cmdvel_timer,SIGNAL(timeout()),this,SLOT(OnAction_Back()));
+        m_cmdvel_timer->start(200);
+    }
+}
+
+void map_menu::OnAction_BtnRelease()
+{
+    m_cmdvel_timer->stop();
+    m_map_main_ctl->m_socket->OnCmdVel(0.0,0.0,0.0);
+    return;
+}
+
+void map_menu::OnAction_Left()
+{
+    printf("OnAction_Left\n");
+    m_map_main_ctl->m_socket->OnCmdVel(0.0,0.0,0.8);
+}
+
+void map_menu::OnAction_Right()
+{
+    m_map_main_ctl->m_socket->OnCmdVel(0.0,0.0,-0.8);
+}
+
+void map_menu::OnAction_Forward()
+{
+    m_map_main_ctl->m_socket->OnCmdVel(0.25,0.0,0.0);
+}
+
+void map_menu::OnAction_Back()
+{
+    m_map_main_ctl->m_socket->OnCmdVel(-0.25,0.0,0.0);
+}
+
 map_menu::map_menu(QWidget *parent) :
     QTabWidget(parent),
     ui(new Ui::map_menu)
@@ -94,6 +147,15 @@ map_menu::map_menu(QWidget *parent) :
     ui->lineEdit_Port->setValidator(pReg2);
 
 
+    connect(ui->action_left,SIGNAL(pressed()),this,SLOT(OnAction_BtnPress()));
+    connect(ui->action_right,SIGNAL(pressed()),this,SLOT(OnAction_BtnPress()));
+    connect(ui->action_forward,SIGNAL(pressed()),this,SLOT(OnAction_BtnPress()));
+    connect(ui->action_back,SIGNAL(pressed()),this,SLOT(OnAction_BtnPress()));
+
+    connect(ui->action_left,SIGNAL(released()),this,SLOT(OnAction_BtnRelease()));
+    connect(ui->action_right,SIGNAL(released()),this,SLOT(OnAction_BtnRelease()));
+    connect(ui->action_forward,SIGNAL(released()),this,SLOT(OnAction_BtnRelease()));
+    connect(ui->action_back,SIGNAL(released()),this,SLOT(OnAction_BtnRelease()));
 
     connect(ui->PatrolCTL,SIGNAL(clicked()),this,SLOT(OnPatrol()));
     connect(ui->Nav_NavigationMode,SIGNAL(clicked()),this,SLOT(OnNav_NavigationMode()));
@@ -107,6 +169,7 @@ map_menu::map_menu(QWidget *parent) :
     connect(ui->lineEdit_Port,SIGNAL(textChanged(QString)),this,SLOT(OnEditChange()));
 
     this->isPatrol = ui->PatrolCTL->isChecked();
+    m_cmdvel_timer = new QTimer(this);
 }
 
 map_menu::~map_menu()

@@ -4,7 +4,7 @@
 #include "socket/CTcpSocket.h"
 
 QTcpSocket *pt_socket = NULL;
-QString sysIP = "192.168.1.121";
+QString sysIP = "192.168.1.128";
 QString sysPort = "8888";
 bool socketThread::isRunOnRobotStatus = false;
 bool socketThread::isRunOnDownloadMap = false;
@@ -328,6 +328,65 @@ void *socketThread::ActivateNode(void *data)
     pop_buf[0] = 0xAA;
     pop_buf[1+sizeof(P_HEAD)+sizeof(NODECTL_PACKAGE_POP)+1]=0xAB;
     if(SendSockPackage(p_socket,pop_buf,sizeof(NODECTL_PACKAGE_ACK),ack_buf) == head->funcId)
+    {
+        printf("Goal cancel success...\n");
+    }
+    closesocket(p_socket);
+    isRunOnActivateNode = false;
+    return NULL;
+}
+
+void socketThread::OnCmdVel(float x, float y, float z)
+{
+    pthread_t id;
+    bool ret;
+    CMDVEL_PACKAGE_POP *p = new CMDVEL_PACKAGE_POP();
+    p->x = x;
+    p->y = y;
+    p->z = z;
+    ret = pthread_create(&id,NULL,CmdVel,p);
+    if(!ret)
+    {
+        //printf("succeed!\n");
+
+    }
+    else
+    {
+        printf("Fail to Create Thread.\n");
+    }
+}
+
+void *socketThread::CmdVel(void *data)
+{
+    CMDVEL_PACKAGE_POP in_Data;
+
+    memcpy(&in_Data,data,sizeof(CMDVEL_PACKAGE_POP));
+    delete data;
+    //pthread_mutex_unlock(&mutex_nodeaction);
+
+    pthread_detach(pthread_self());
+    char pop_buf[80];
+    char ack_buf[80];
+    //map_main *p_map_main = (map_main *)data;
+    //map_view *p_map_view = (map_view *)(p_map_main->m_map_view_ctl);
+    QTcpSocket socket;
+    QTcpSocket *p_socket = &socket;
+
+    isRunOnActivateNode = true;
+    if(!connectsocket(p_socket)){
+        closesocket(p_socket);
+        isRunOnActivateNode = false;
+        return NULL;
+    }
+    P_HEAD *head = (P_HEAD*)(pop_buf+1);
+    CMDVEL_PACKAGE_POP *pop_package = (CMDVEL_PACKAGE_POP*)(pop_buf+1+sizeof(P_HEAD));
+    head->funcId = PACK_CMDVEL;
+    head->size = sizeof(P_HEAD)+sizeof(CMDVEL_PACKAGE_POP);
+    memcpy(pop_package,&in_Data,sizeof(CMDVEL_PACKAGE_POP));
+
+    pop_buf[0] = 0xAA;
+    pop_buf[1+sizeof(P_HEAD)+sizeof(CMDVEL_PACKAGE_POP)+1]=0xAB;
+    if(SendSockPackage(p_socket,pop_buf,sizeof(CMDVEL_PACKAGE_ACK),ack_buf) == head->funcId)
     {
         printf("Goal cancel success...\n");
     }

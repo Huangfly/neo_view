@@ -41,3 +41,6 @@ HEADERS  += socket/CThreadBase.h \
 FORMS    += src/map_view.ui \
     src/map_menu.ui \
     src/map_main.ui
+
+RESOURCES += \
+    ui/myres.qrc

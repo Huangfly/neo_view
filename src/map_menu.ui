@@ -46,7 +46,7 @@ QTabBar::tab:selected {
 }</string>
   </property>
   <property name="currentIndex">
-   <number>3</number>
+   <number>0</number>
   </property>
   <widget class="QWidget" name="action">
    <attribute name="title">
@@ -66,21 +66,19 @@ QTabBar::tab:selected {
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton{
-color:rgb(255, 255, 255);
-border-radius:10px;
-background-color:rgb(78, 125, 224);
+border-image: url(:/left.png);
 }
 
 QPushButton:pressed {
-    background-color: rgb(28, 59, 124);
+border-image: url(:/left_press.png);
 }
 
 QPushButton::checked {
-   background-color: rgb(28, 59, 124);
+border-image: url(:/left_press.png);
 }</string>
     </property>
     <property name="text">
-     <string>&lt;-</string>
+     <string/>
     </property>
    </widget>
    <widget class="QPushButton" name="action_right">
@@ -97,21 +95,19 @@ QPushButton::checked {
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton{
-color:rgb(255, 255, 255);
-border-radius:10px;
-background-color:rgb(78, 125, 224);
+border-image: url(:/right.png);
 }
 
 QPushButton:pressed {
-    background-color: rgb(28, 59, 124);
+border-image: url(:/right_press.png);
 }
 
 QPushButton::checked {
-   background-color: rgb(28, 59, 124);
+border-image: url(:/right_press.png);
 }</string>
     </property>
     <property name="text">
-     <string>-&gt;</string>
+     <string/>
     </property>
    </widget>
    <widget class="QPushButton" name="action_forward">
@@ -128,21 +124,20 @@ QPushButton::checked {
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton{
-color:rgb(255, 255, 255);
-border-radius:10px;
-background-color:rgb(78, 125, 224);
+border-image: url(:/up.png);
 }
 
 QPushButton:pressed {
-    background-color: rgb(28, 59, 124);
+border-image: url(:/up_press.png);
 }
 
 QPushButton::checked {
-   background-color: rgb(28, 59, 124);
-}</string>
+border-image: url(:/up_press.png);
+}
+</string>
     </property>
     <property name="text">
-     <string>^</string>
+     <string/>
     </property>
    </widget>
    <widget class="QPushButton" name="action_back">
@@ -159,21 +154,19 @@ QPushButton::checked {
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton{
-color:rgb(255, 255, 255);
-border-radius:10px;
-background-color:rgb(78, 125, 224);
+border-image: url(:/down.png);
 }
 
 QPushButton:pressed {
-    background-color: rgb(28, 59, 124);
+border-image: url(:/down_press.png);
 }
 
 QPushButton::checked {
-   background-color: rgb(28, 59, 124);
+border-image: url(:/down_press.png);
 }</string>
     </property>
     <property name="text">
-     <string>v</string>
+     <string/>
     </property>
    </widget>
   </widget>

@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>NeoSlamWare</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../ui/myres.qrc">
+    <normaloff>:/logo.ico</normaloff>:/logo.ico</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">QWidget{
 background: rgb(66, 66, 66);
@@ -217,6 +221,8 @@ QPushButton::checked {
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../ui/myres.qrc"/>
+ </resources>
  <connections/>
 </ui>

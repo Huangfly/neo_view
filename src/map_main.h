@@ -44,10 +44,11 @@ public:
     STATUS_PACKAGE_ACK m_robot_status;
     QWidget *m_map_view_ctl;
     QWidget *m_map_menu_ctl;
+    socketThread *m_socket;
 protected:
 private:
     Ui::map_main *ui;
-    socketThread *m_socket;
+
 
     bool isActionRobot;
 };

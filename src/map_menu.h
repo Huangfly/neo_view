@@ -24,6 +24,13 @@ public slots:
     void OnSlam_SaveMap();
     void OnSlam_ClearMap();
 
+    void OnAction_BtnPress();
+    void OnAction_BtnRelease();
+    void OnAction_Left();
+    void OnAction_Right();
+    void OnAction_Forward();
+    void OnAction_Back();
+
 public:
     explicit map_menu(QWidget *parent = 0);
     ~map_menu();
@@ -34,6 +41,8 @@ private:
     Ui::map_menu *ui;
     map_main *m_map_main_ctl;
     map_view *m_map_view_ctl;
+    CMDVEL_PACKAGE_POP cmdvel_body;
+    QTimer *m_cmdvel_timer;
 };
 
 #endif // MAP_MENU_H

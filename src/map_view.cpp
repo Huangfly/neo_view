@@ -315,7 +315,7 @@ void map_view::paintGL()
     }
     glFlush();
     //------Pose------
-    float aaa[4] = {0.0,0.0,0.0,1.0};
+
     if(map_width > 0)
     {
         setStaticPose(0.3,   1.0,0.0,0.0);
@@ -607,6 +607,7 @@ void map_view::clearMap()
 {
     clearGoals();
     delete_MapData();
+    emit map_view::updateUI();
 }
 
 void map_view::OnSaveMap()

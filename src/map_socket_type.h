@@ -7,6 +7,7 @@
 #define PACK_GOAL		3 //
 #define PACK_CANCELGOAL	4 //
 #define PACK_NODECTL	5 //
+#define PACK_CMDVEL     8 //
 
 typedef struct {
     float x;
@@ -84,6 +85,16 @@ typedef struct {
 typedef struct {
     char ack[10];
 }NODECTL_PACKAGE_ACK;
+
+typedef struct {
+    float x;
+    float y;
+    float z;
+}CMDVEL_PACKAGE_POP;
+
+typedef struct {
+    char ack;
+}CMDVEL_PACKAGE_ACK;
 
 #endif // MAP_SOCKET_TYPE
 

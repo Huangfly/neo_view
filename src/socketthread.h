@@ -21,6 +21,8 @@ public:
     static void *CancelGoal(void *data);
     void OnActivateNode(std::string str,char enable);
     static void *ActivateNode(void *data);
+    void OnCmdVel(float x,float y,float z);
+    static void *CmdVel(void *data);
 
     static bool isRunOnRobotStatus;
     static bool isRunOnDownloadMap;
