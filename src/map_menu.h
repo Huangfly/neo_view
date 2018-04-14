@@ -2,7 +2,7 @@
 #define MAP_MENU_H
 
 #include <QTabWidget>
-#include "map_view.h"
+#include "Map_View.h"
 #include "map_main.h"
 
 namespace Ui {
@@ -34,13 +34,13 @@ public slots:
 public:
     explicit map_menu(QWidget *parent = 0);
     ~map_menu();
-    void init(map_main *p, map_view *pp);
+    void init(map_main *p, Map_View *pp);
     bool isPatrol;
 
 private:
     Ui::map_menu *ui;
     map_main *m_map_main_ctl;
-    map_view *m_map_view_ctl;
+    Map_View *m_map_view_ctl;
     CMDVEL_PACKAGE_POP cmdvel_body;
     QTimer *m_cmdvel_timer;
 };

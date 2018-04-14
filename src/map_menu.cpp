@@ -1,5 +1,9 @@
 #include "map_menu.h"
 #include "ui_map_menu.h"
+#include "main.h"
+#include "map_main.h"
+
+using namespace Win;
 
 extern QString sysIP;
 extern QString sysPort;
@@ -55,8 +59,9 @@ void map_menu::OnClearGoals()
 {
     if(m_map_view_ctl == NULL)return;
 
-    m_map_view_ctl->clearGoals();
-    m_map_view_ctl->update();
+    map_main *ctl = Win::GetMainWin();
+    ctl->m_MapViewCtl.ClearGoals();
+
 }
 
 void map_menu::OnEditChange()
@@ -70,13 +75,14 @@ void map_menu::OnEditChange()
 
 void map_menu::OnSlam_SaveMap()
 {
-    this->m_map_view_ctl->OnSaveMap();
-    printf("Save Map1\n");
+    map_main* ctl = Win::GetMainWin();
+    ctl->m_MapViewCtl.SaveMap("aaa.map");
 }
 
 void map_menu::OnSlam_ClearMap()
 {
-    this->m_map_view_ctl->clearMap();
+    map_main *ctl = Win::GetMainWin();
+    ctl->m_MapViewCtl.clearMap();
 }
 
 
@@ -107,29 +113,29 @@ void map_menu::OnAction_BtnPress()
 void map_menu::OnAction_BtnRelease()
 {
     m_cmdvel_timer->stop();
-    m_map_main_ctl->m_socket->OnCmdVel(0.0,0.0,0.0);
+    m_map_main_ctl->m_socketMag->OnCmdVel(0.0,0.0,0.0);
     return;
 }
 
 void map_menu::OnAction_Left()
 {
     printf("OnAction_Left\n");
-    m_map_main_ctl->m_socket->OnCmdVel(0.0,0.0,0.8);
+    m_map_main_ctl->m_socketMag->OnCmdVel(0.0,0.0,0.8);
 }
 
 void map_menu::OnAction_Right()
 {
-    m_map_main_ctl->m_socket->OnCmdVel(0.0,0.0,-0.8);
+    m_map_main_ctl->m_socketMag->OnCmdVel(0.0,0.0,-0.8);
 }
 
 void map_menu::OnAction_Forward()
 {
-    m_map_main_ctl->m_socket->OnCmdVel(0.25,0.0,0.0);
+    m_map_main_ctl->m_socketMag->OnCmdVel(0.25,0.0,0.0);
 }
 
 void map_menu::OnAction_Back()
 {
-    m_map_main_ctl->m_socket->OnCmdVel(-0.25,0.0,0.0);
+    m_map_main_ctl->m_socketMag->OnCmdVel(-0.25,0.0,0.0);
 }
 
 map_menu::map_menu(QWidget *parent) :
@@ -177,7 +183,7 @@ map_menu::~map_menu()
     delete ui;
 }
 
-void map_menu::init(map_main *p, map_view *pp)
+void map_menu::init(map_main *p, Map_View *pp)
 {
     this->m_map_main_ctl = p;
     this->m_map_view_ctl = pp;

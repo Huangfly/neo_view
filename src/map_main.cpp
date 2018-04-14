@@ -1,5 +1,6 @@
-#include "map_main.h"
 #include "ui_map_main.h"
+#include "map_main.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -34,40 +35,36 @@ void map_main::lockRobot()
     this->m_robot_timer->stop();
 }
 
-void map_main::OnActionRobot()
+void map_main::OnLockRobot()
 {
-  /*  if(this->isActionRobot)
+    if(ui->pushButton_1->isChecked())
     {
-        //if(!closesocket())return;
-        ui->pushButton->setText("Action Robot");
-        this->isActionRobot = false;
-        this->m_robot_timer->stop();
+        m_MapViewCtl.lockMove();
     }
     else
     {
-        //if(!connectsocket())return;
-        ui->pushButton->setText("Close Robot");
-        this->isActionRobot = true;
-        this->m_robot_timer->start(200);
+        m_MapViewCtl.unlockMove();
     }
-    this->update();*/
 }
-
 
 void map_main::OnRobotTimer()
 {
-    if(!isActionRobot)return;
-    if(m_robot_status.updateMap)
-    {
-        if(!socketThread::isRunOnDownloadMap)
-        {
-            m_socket->OnDownloadMap(this);
-        }
-    }else{
 
-    if(!socketThread::isRunOnRobotStatus)
-        m_socket->OnRobotStatus(this);
+    if(!isActionRobot)return;
+
+    timerCount++;
+    if(timerCount%1 == 0){
+        m_socketMag->OnDownloadLidarData();
     }
+
+
+
+    if(timerCount%5 == 0)
+    {
+        m_socketMag->OnDownloadMap();
+    }
+
+    m_socketMag->OnRobotStatus();
 }
 
 void map_main::OnResetPose()
@@ -79,35 +76,33 @@ void map_main::OnLockRot()
 {
     if(ui->pushButton_2->isChecked())
     {
-        ui->_map_view->locksetGoal();
+        this->m_MapViewCtl.enableSetGoal();
     }
     else
     {
-        ui->_map_view->unlocksetGoal();
+        this->m_MapViewCtl.unableSetGoal();
     }
 }
 
 void map_main::OnSendGoal()
 {
     if(!this->isActionRobot)return;
-    if(!socketThread::isRunOnSendGoal){
-        m_socket->OnSendGoal(this);
-    }
-    emit ui->pushButton_2->click();
+    m_socketMag->OnSendGoal();
+    //emit ui->pushButton_2->click();
 }
 
 void map_main::OnCancelMove()
 {
     ui->_map_view->clearGoals();
-    if(!socketThread::isRunOnCancelGoal){
-        m_socket->OnCancelGoal(this);
-    }
+    m_socketMag->OnCancelGoal();
 }
 
 map_main::map_main(QWidget *parent) :
     QWidget(parent),
     sysIP("192.168.1.121"),
     sysPort("8888"),
+    m_MapViewCtl(),
+    m_MapViewModle(),
     ui(new Ui::map_main)
 {
     ui->setupUi(this);
@@ -116,12 +111,12 @@ map_main::map_main(QWidget *parent) :
     setFixedSize(this->width(), this->height());
     ui->_map_menu->init(this, ui->_map_view);
 
-    this->m_map_view_ctl = ui->_map_view;
-    this->m_map_menu_ctl = ui->_map_menu;
+    //this->m_map_view_ctl = ui->_map_view;
+    //this->m_map_menu_ctl = ui->_map_menu;
     this->isActionRobot = false;
     this->m_robot_timer = new QTimer(this);
 
-    connect(ui->pushButton,SIGNAL(clicked()),SLOT(OnActionRobot()));
+    connect(ui->pushButton_1,SIGNAL(clicked()),SLOT(OnLockRobot()));
     connect(ui->pushButton_2,SIGNAL(clicked()),SLOT(OnLockRot()));
     connect(ui->pushButton_3,SIGNAL(clicked()),SLOT(OnResetPose()));
     connect(ui->pushButton_4,SIGNAL(clicked()),SLOT(OnSendGoal()));
@@ -133,8 +128,16 @@ map_main::map_main(QWidget *parent) :
 
     memset(&m_robot_status,0,sizeof(STATUS_PACKAGE_ACK));
 
-    this->m_socket = new socketThread();
-    //this->m_robot_timer->start(1);
+    this->m_socketMag = new MapTcp::ManagerSocket();
+
+
+    this->m_MapViewModle.init(ui->_map_view->geometry().width(),ui->_map_view->geometry().height());
+
+    this->m_MapViewCtl.init(ui->_map_view,&this->m_MapViewModle);
+    this->m_MapViewCtl.create();
+
+    timerCount = 0;
+
 }
 
 map_main::~map_main()
@@ -143,9 +146,9 @@ map_main::~map_main()
     delete m_robot_timer;
 }
 
-void map_main::OnActivateNode(std::string str,char enable)
+void map_main::OnActivateNode(QString str,bool enable)
 {
     if(!this->isActionRobot)return;
-    m_socket->OnActivateNode(str,enable);
+    m_socketMag->OnActivateNode(str,enable);
     //printf("%s.\n",str.c_str());
 }

@@ -15,14 +15,14 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../ui/myres.qrc">
-    <normaloff>:/logo.ico</normaloff>:/logo.ico</iconset>
+    <normaloff>:/w_logo.ico</normaloff>:/w_logo.ico</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget{
 background: rgb(66, 66, 66);
 }</string>
   </property>
-  <widget class="map_view" name="_map_view" native="true">
+  <widget class="Map_View" name="_map_view" native="true">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -35,7 +35,7 @@ background: rgb(66, 66, 66);
     <string notr="true"/>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="pushButton_1">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -63,7 +63,7 @@ QPushButton::checked {
 }</string>
    </property>
    <property name="text">
-    <string>Action Robot</string>
+    <string>LockMove</string>
    </property>
    <property name="checkable">
     <bool>true</bool>
@@ -209,15 +209,15 @@ QPushButton::checked {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>map_view</class>
+   <class>map_menu</class>
    <extends>QWidget</extends>
-   <header location="global">map_view.h</header>
+   <header location="global">src/map_menu.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>map_menu</class>
+   <class>Map_View</class>
    <extends>QWidget</extends>
-   <header location="global">map_menu.h</header>
+   <header location="global">src/Map_View.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

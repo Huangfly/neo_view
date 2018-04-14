@@ -11,36 +11,46 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = neo_view
 TEMPLATE = app
 LIBS += -lGLU
+CONFIG += c++11
 
-SOURCES += socket/CThreadBase.cpp \
-    socket/CThreadPool.cpp \
-    socket/CSocket.cpp \
-    socket/CTcpSocket.cpp \
-    socket/CUdpSocket.cpp \
-    socket/CStreamBase.cpp \
+SOURCES += \
     src/main.cpp \
     src/map_main.cpp \
     src/map_menu.cpp \
-    src/map_view.cpp \
-    src/socketthread.cpp \
-    socket/CHostAddr.cpp
+    src/Map_Control.cpp \
+    src/Map_Model.cpp \
+    src/Map_View.cpp \
+    socket/TcpTaskRobotStatus.cpp \
+    socket/TcpTaskBase.cpp \
+    socket/TcpTaskDownloadMap.cpp \
+    socket/TcpSocket.cpp \
+    socket/TcpTaskCmdVel.cpp \
+    src/ManagerSocket.cpp \
+    socket/TcpTaskActionNode.cpp \
+    socket/TcpTaskGoal.cpp \
+    socket/TcpTaskLidar.cpp
 
-HEADERS  += socket/CThreadBase.h \
-    socket/CThreadPool.h \
-    socket/CSocket.h \
-    socket/CTcpSocket.h \
-    socket/CUdpSocket.h \
-    socket/CStreamBase.h \
-    src/map_main.h \
+HEADERS  += src/map_main.h \
     src/map_menu.h \
     src/map_socket_type.h \
-    src/map_view.h \
-    src/socketthread.h \
-    socket/CHostAddr.h
+    src/Map_Control.h \
+    src/Map_Model.h \
+    src/Map_View.h \
+    socket/TcpTaskRobotStatus.h \
+    src/main.h \
+    socket/TcpTaskBase.h \
+    socket/TcpTaskDownloadMap.h \
+    socket/TcpSocket.h \
+    socket/TcpTaskCmdVel.h \
+    src/ManagerSocket.h \
+    socket/TcpTaskActionNode.h \
+    socket/TcpTaskGoal.h \
+    socket/TcpTaskLidar.h
 
-FORMS    += src/map_view.ui \
+FORMS    += \
     src/map_menu.ui \
-    src/map_main.ui
+    src/map_main.ui \
+    src/Map_View.ui
 
 RESOURCES += \
     ui/myres.qrc

@@ -8,6 +8,7 @@
 #define PACK_CANCELGOAL	4 //
 #define PACK_NODECTL	5 //
 #define PACK_CMDVEL     8 //
+#define PACK_LIDAR      9 //
 
 typedef struct {
     float x;
@@ -95,6 +96,25 @@ typedef struct {
 typedef struct {
     char ack;
 }CMDVEL_PACKAGE_ACK;
+
+
+typedef struct {
+    unsigned int serial_num;
+    unsigned int package_sum;// map package total sum.
+    unsigned int package_num;// map package num.
+    float angle_min;
+    float angle_max;
+    float angle_increment;
+    ST_POSE pose;
+    unsigned int this_rangs_size;
+    float rangs[100];
+}LIDAR_PACKAGE_ACK;
+
+typedef struct {
+    unsigned int serial_num;
+    unsigned int package_sum;// map package total sum.
+    unsigned int package_num;// map package num.
+}LIDAR_PACKAGE_POP;
 
 #endif // MAP_SOCKET_TYPE
 

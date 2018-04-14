@@ -9,5 +9,6 @@
         <file>right_press.png</file>
         <file>up.png</file>
         <file>up_press.png</file>
+        <file>w_logo.ico</file>
     </qresource>
 </RCC>
