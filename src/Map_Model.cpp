@@ -275,15 +275,19 @@ void Map_Model::init(int w_width,int w_hight)
 
 void Map_Model::initGL()
 {
+    glEnable( GL_MULTISAMPLE );
+    glEnable( GL_DEPTH_TEST );
     glClearColor (MAP_BACKGROUND_COLOR, MAP_BACKGROUND_COLOR, MAP_BACKGROUND_COLOR, 0.0);
-    glLoadIdentity();
-    glEnable(GL_DEPTH_TEST);///开启深度缓存测试
+    //glLoadIdentity();
+    //glEnable(GL_DEPTH_TEST);///开启深度缓存测试
     printf("initializeGL...\n");
 }
-
+static unsigned long draw_count = 0;
 void Map_Model::drawGL()
 {
-    //printf("drawGL..\n");
+    printf("drawGL..%ld\n",draw_count);
+    draw_count++;
+    //if(draw_count%100 != 0)return ;
     //glMatrixMode(GL_MODELVIEW);
     //glLoadIdentity();
 
@@ -417,10 +421,10 @@ void Map_Model::drawGL()
 
 void Map_Model::resizeGL(int w, int h)
 {
-    glViewport(0, 0, (GLsizei)(w), (GLsizei)(h));
+    /*glViewport(0, 0, (GLsizei)(w), (GLsizei)(h));
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glOrtho((map_zoom*w/h),(map_zoom*w/h),map_zoom,map_zoom,-100,100);
+    glOrtho((map_zoom*w/h),(map_zoom*w/h),map_zoom,map_zoom,-100,100);*/
     printf("resizeGL...\n");
 /*
     m_robot_info_label->setGeometry(10,win_hight-30,win_width-10,20);

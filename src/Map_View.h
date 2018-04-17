@@ -34,17 +34,6 @@ namespace MapWin {
 
         void showCursorPoseLabel(float x,float y);
 
-        void resetPose();
-        void locksetGoal();
-        void unlocksetGoal();
-        int getGoalsFromList(ST_POSE *pose,char mode);
-        void clearFrontGoals();
-        void clearGoals();
-        void resetNextGoal();
-        void clearMap();
-
-        void OnSaveMap();
-
 
         void emitUpdateUI();
 

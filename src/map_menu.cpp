@@ -37,7 +37,7 @@ void map_menu::OnNav_NavigationMode()
         }
 
     }else{
-        m_map_main_ctl->OnActivateNode("navigation",0);
+        //m_map_main_ctl->OnActivateNode("navigation",0);
         m_map_main_ctl->lockRobot();
     }
 }
@@ -70,6 +70,10 @@ void map_menu::OnEditChange()
       sysIP = ui->lineEdit_IP->text();
     if(!ui->lineEdit_Port->text().isEmpty())
       sysPort = ui->lineEdit_Port->text();
+
+    map_main *ctl = Win::GetMainWin();
+    if(ctl != NULL)
+        ctl->m_socketMag->setIpPort(sysIP,sysPort);
     //ui->lineEdit_IP->
 }
 

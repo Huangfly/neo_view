@@ -69,7 +69,7 @@ void map_main::OnRobotTimer()
 
 void map_main::OnResetPose()
 {
-    ui->_map_view->resetPose();
+    //ui->_map_view->resetPose();
 }
 
 void map_main::OnLockRot()
@@ -93,7 +93,7 @@ void map_main::OnSendGoal()
 
 void map_main::OnCancelMove()
 {
-    ui->_map_view->clearGoals();
+    m_MapViewCtl.ClearGoals();
     m_socketMag->OnCancelGoal();
 }
 
@@ -109,8 +109,8 @@ map_main::map_main(QWidget *parent) :
     setWindowFlags(windowFlags()& ~Qt::WindowMaximizeButtonHint);
     //setWindowFlags(windowFlags() &~ (Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint));
     setFixedSize(this->width(), this->height());
-    ui->_map_menu->init(this, ui->_map_view);
 
+    ui->_map_menu->init(this, ui->_map_view);
     //this->m_map_view_ctl = ui->_map_view;
     //this->m_map_menu_ctl = ui->_map_menu;
     this->isActionRobot = false;

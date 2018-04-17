@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = neo_view
 TEMPLATE = app
 LIBS += -lGLU
-CONFIG += c++11
+CONFIG += c++11 console
 
 SOURCES += \
     src/main.cpp \

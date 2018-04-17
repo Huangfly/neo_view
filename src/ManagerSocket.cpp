@@ -1,12 +1,11 @@
 #include "ManagerSocket.h"
 #include "map_main.h"
 #include "Map_View.h"
-#include "socket/CTcpSocket.h"
 
 using namespace MapTcp;
 
 QTcpSocket *pt_socket = NULL;
-QString sysIP = "192.168.1.128";
+QString sysIP = "192.168.1.127";
 QString sysPort = "8888";
 
 ManagerSocket::ManagerSocket():
@@ -54,5 +53,16 @@ void ManagerSocket::OnDownloadLidarData()
 {
     this->ThreadLidar.startThread();
 }
+
+void ManagerSocket::setIpPort(QString ip, QString port)
+{
+    this->ThreadActionNode.p_socket->setIpPort(ip,port);
+    this->ThreadCmdVel.p_socket->setIpPort(ip,port);
+    this->ThreadDownloadMap.p_socket->setIpPort(ip,port);
+    this->ThreadGoal.p_socket->setIpPort(ip,port);
+    this->ThreadLidar.p_socket->setIpPort(ip,port);
+    this->ThreadRobotStatus.p_socket->setIpPort(ip,port);
+}
+
 
 

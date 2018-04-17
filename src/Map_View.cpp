@@ -3,6 +3,7 @@
 #include "map_main.h"
 #include "map_menu.h"
 #include "Map_Model.h"
+#include <QGraphicsView>
 
 
 #define checkImageWidth 10
@@ -106,85 +107,8 @@ void Map_View::showCursorPoseLabel(float x, float y)
     str.sprintf("[%3.2f  %3.2f]",x,y);
     m_cursor_info_label->setGeometry(10,this->geometry().height()-50,this->geometry().width()-10,20);
     m_cursor_info_label->setText(str);
-    m_cursor_info_label->update();
-}
-
-void Map_View::resetPose()
-{
-    update();
-}
-
-void Map_View::locksetGoal()
-{
-    this->isSetPose = true;
-}
-
-void Map_View::unlocksetGoal()
-{
-    this->isSetPose = false;
-}
-
-int Map_View::getGoalsFromList(ST_POSE *pose, char mode)
-{
-    if(pose == NULL) return -1;
-    if(m_goals.size() <= 0) return 0;
-    if(mode == 0){
-        list<ST_POSE>::iterator it = m_goals.begin();
-        pose->x = it->x;
-        pose->y = it->y;
-        pose->z = it->z;
-        memcpy(pose->Quaternion,it->Quaternion,sizeof(pose->Quaternion));
-
-        return m_goals.size();
-    }else{
-        return 0;
-    }
-}
-
-void Map_View::clearFrontGoals()
-{
-    if(m_goals.size() > 0) this->m_goals.pop_front();
-}
-
-void Map_View::clearGoals()
-{
-    if(m_goals.size() > 0) m_goals.clear();
-}
-
-void Map_View::resetNextGoal()
-{
-    if(m_goals.size()<=1)return;
-    ST_POSE pose;
-    list<ST_POSE>::iterator it = m_goals.begin();
-    pose.x = it->x;
-    pose.y = it->y;
-    pose.z = it->z;
-    memcpy(pose.Quaternion,it->Quaternion,sizeof(pose.Quaternion));
-    m_goals.pop_front();
-    m_goals.push_back(pose);
-
-}
-
-void Map_View::clearMap()
-{
-}
-
-void Map_View::OnSaveMap()
-{
-    QFile file("11.map");
-
-    if (file.open(QIODevice::WriteOnly)) //打开方式：可读、二进制方式
-    {/*
-        char buf[10] = {0};
-        for(int i = 0; i<map_width*map_hight; i++)
-        {
-            sprintf(buf,"%d ",map_data[i]);
-            file.write(buf, strlen(buf));
-        }
-        printf("Save Map\n");*/
-
-        file.close();
-    }
+    //m_cursor_info_label->show();
+    //m_cursor_info_label->update();
 }
 
 void Map_View::emitUpdateUI()

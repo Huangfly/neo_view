@@ -54,13 +54,13 @@ void TcpTaskRobotStatus::run()
         }
         if(ackhead->funcId == PACK_HEARD && ret>=0)
         {
-            printf("recv(%d) success\n",ack_package->updateMap);
+            //printf("recv(%d) success\n",ack_package->updateMap);
             memcpy(&main_ptr->m_robot_status,ack_package,sizeof(STATUS_PACKAGE_ACK));
             main_ptr->m_MapViewCtl.updateRobotPose(main_ptr->m_robot_status);
         }
         else
         {
-            printf("TcpTaskRobotStatus fail.\n");
+            //printf("TcpTaskRobotStatus fail.\n");
         }
     }while(0);
 

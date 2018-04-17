@@ -13,6 +13,7 @@ namespace MapTcp {
         bool closeSocket();
         bool connectSocket(QThread *thread);
         int SendSockPackage(char *buf, int ack_len, char *ack);
+        void setIpPort(QString ip,QString port){ sysIP = ip; sysPort = port; }
     public slots:
         void OnSocketConnected();
         void OnSocketDisconnected();

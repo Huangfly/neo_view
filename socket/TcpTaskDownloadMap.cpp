@@ -95,7 +95,7 @@ void TcpTaskDownloadMap::run()
         //closesocket(p_socket);
     }while(map_pop->package_sum != 0 && map_pop->package_sum >= map_ack->package_num);
 
-    printf("map ack w:%d h:%d size:%d recv:%d\n",map_ack->width,map_ack->hight,map_ack->size,(int)(DataPos-map_Data));
+    //printf("map ack w:%d h:%d size:%d recv:%d\n",map_ack->width,map_ack->hight,map_ack->size,(int)(DataPos-map_Data));
     //printf("ack x:%f y:%f \n",map_ack->x,map_ack->y);
 
     this->p_socket->closeSocket();

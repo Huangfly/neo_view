@@ -118,11 +118,12 @@ void Map_Control::mouseMove(QMouseEvent *event)
     float ny = (float)mouse_LastPos.y();
     model_->globalpose_to_mappose(dx,dy);
     model_->globalpose_to_mappose(nx,ny);
-    view_->showCursorPoseLabel(dx,dy);
+
     if (event->buttons() & Qt::LeftButton && !isLockMove)
     {
         model_->moveMap( ( (dx-nx)*model_->getRoll() ), ( (dy-ny)*model_->getRoll() ) );
     }
+    view_->showCursorPoseLabel(dx,dy);
     //view_->updateUI();
 
     mouse_LastPos = event->pos();
@@ -137,19 +138,19 @@ void Map_Control::mouseRelease(QMouseEvent *event)
 void Map_Control::updateMap(char *data, int w, int h, float resolution, ST_POSE pose)
 {
     model_->updateMap(data,w,h,resolution,pose);
-    view_->updateUI();
+    view_->emitUpdateUI();
 }
 
 void Map_Control::updateMap(std::vector<char> data, int w, int h, float resolution, ST_POSE pose)
 {
     model_->updateMap(data,w,h,resolution,pose);
-    view_->updateUI();
+    view_->emitUpdateUI();
 }
 
 void Map_Control::clearMap()
 {
     model_->clearMap();
-    view_->updateUI();
+    view_->emitUpdateUI();
 }
 
 void Map_Control::SaveMap(QString file_name)
@@ -160,7 +161,7 @@ void Map_Control::SaveMap(QString file_name)
 void Map_Control::updateRobotPose(STATUS_PACKAGE_ACK pose)
 {
     model_->updateRobot(pose);
-    view_->updateUI();
+    view_->emitUpdateUI();
 }
 
 bool Map_Control::GetGoal( POSE &goal )
@@ -185,6 +186,6 @@ bool Map_Control::GetGoal(GOAL_PACKAGE_POP *goal)
 void Map_Control::updateLidarData(std::vector<float> vec, float angle_min,float angle_max,float angle_increment, ST_POSE pose)
 {
     model_->updateLidarData(vec,angle_min,angle_max,angle_increment,pose);
-    view_->updateUI();
+    view_->emitUpdateUI();
 }
 

@@ -26,6 +26,8 @@ namespace MapTcp {
         void OnCmdVel(float x,float y,float z);
         void OnDownloadLidarData();
 
+        void setIpPort(QString ip, QString port);
+
     signals:
 
     public slots:
