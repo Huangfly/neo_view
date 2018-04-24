@@ -43,6 +43,7 @@ Map_View::Map_View(QWidget *parent) :
     //memset(&map_pose,0,sizeof(ST_POSE));
 
     main_view_ctl = parent;
+    mFullScreen = false;
 
     connect(this,SIGNAL(updateUI()),this,SLOT(OnUpdateUI()));
 
@@ -61,6 +62,7 @@ Map_View::~Map_View()
 
 void Map_View::initializeGL()
 {
+    //initializeOpenGLFunctions();
     map_main *main_ptr = (map_main*)this->main_view_ctl;
     main_ptr->m_MapViewCtl.initGL();
 }
@@ -95,6 +97,20 @@ void Map_View::mouseReleaseEvent(QMouseEvent *event)
     main_ptr->m_MapViewCtl.mouseRelease(event);
 }
 
+void Map_View::keyPressEvent(QKeyEvent *event)
+{
+    switch(event->key())
+    {
+        case Qt::Key_F2:
+        {
+            FullScreen();
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 void Map_View::wheelEvent(QWheelEvent *event)
 {
     map_main *main_ptr = (map_main*)this->parent();
@@ -110,6 +126,22 @@ void Map_View::showCursorPoseLabel(float x, float y)
     //m_cursor_info_label->show();
     //m_cursor_info_label->update();
 }
+
+void Map_View::FullScreen()
+{
+    mFullScreen = !mFullScreen;
+    if (mFullScreen) {
+
+        showFullScreen();
+    }
+    else {
+        showNormal();
+    }
+    printf("------------------F2\n");
+    update();
+}
+
+
 
 void Map_View::emitUpdateUI()
 {

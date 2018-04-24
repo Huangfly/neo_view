@@ -1,6 +1,7 @@
 #include "Map_Model.h"
 #include "main.h"
 #include "map_main.h"
+#include <QOpenGLFunctions>
 
 #define checkImageWidth 10
 #define checkImageHeight 10
@@ -88,10 +89,10 @@ static void setPoint(float x, float y,float z,float resolution, float red, float
 {
    glBegin(GL_QUADS);
    glColor3f(red, green, blue);
-   glVertex3f(x, y, z);
-   glVertex3f(x+resolution, y, z);
-   glVertex3f(x+resolution, y+resolution, z);
-   glVertex3f(x, y+resolution, z);
+   glVertex2f(x, y);
+   glVertex2f(x+resolution, y);
+   glVertex2f(x+resolution, y+resolution);
+   glVertex2f(x, y+resolution);
    glEnd();
 }
 
@@ -104,8 +105,26 @@ static void setPoint(float x, float y,float z,float resolution, float red, float
 //
 //
 */
-float points[8][3]  = {{-0.3f,-1.0f,0.0f},{-0.3f,1.0f,0.0f},{0.0f,-1.0f,0},{0.0f,1.0f,0.0f},{-0.3f,-1.0f,0.5},{-0.3f,1.0f,0.5},{0.0f,-1.0f,0.5},{0.0f,1.0f,0.5}};
-float points1[8][3] = {{0.0f,-0.2f,0.0f},{0.0f,0.2f,0.0f},{1.0f,-0.2f,0},{1.0f,0.2f,0.0f},{0.0f,-0.2f,0.5},{0.0f,-0.2f,0.5},{1.0f,-0.2f,0.5},{1.0f,0.2f,0.5}};
+float points[8][3]  = {
+    {-0.3f,-1.0f,0.0f},
+    {-0.3f,1.0f,0.0f},
+    {0.0f,-1.0f,0.0f},
+    {0.0f,1.0f,0.0f},
+    {-0.3f,-1.0f,0.005f},
+    {-0.3f,1.0f,0.005f},
+    {0.0f,-1.0f,0.005f},
+    {0.0f,1.0f,0.005f}
+};
+float points1[8][3] = {
+    {0.0f,-0.2f,0.0f},
+    {0.0f,0.2f,0.0f},
+    {1.0f,-0.2f,0.0f},
+    {1.0f,0.2f,0.0f},
+    {0.0f,-0.2f,0.005f},
+    {0.0f,-0.2f,0.005f},
+    {1.0f,-0.2f,0.005f},
+    {1.0f,0.2f,0.005f}
+};
 
 static void quad(int n1, int n2, int n3, int n4, float size)
 {
@@ -193,10 +212,10 @@ static void setPose(float x, float y,float z, float size, float red, float green
    float side_pose_l_y = y+R/2.0f*sin(angle+PI/1.5);
    glBegin(GL_POLYGON);
    glColor3f(red, green, blue);
-   glVertex3f(x, y, z);
-   glVertex3f(side_pose_r_x, side_pose_r_y, z);
-   glVertex3f(top_pose_x, top_pose_y, z);
-   glVertex3f(side_pose_l_x, side_pose_l_y, z);
+   glVertex2f(x, y);
+   glVertex2f(side_pose_r_x, side_pose_r_y);
+   glVertex2f(top_pose_x, top_pose_y);
+   glVertex2f(side_pose_l_x, side_pose_l_y);
    glEnd();
 }
 /*
@@ -234,22 +253,20 @@ static void setGoal(float x, float y,float z, float size, float red, float green
    glEnd();
 }
 
-
-Map_Model::Map_Model()
+/*-------------------------------------------------------------------------------------------------------*/
+Map_Model::Map_Model():
+    m_Camera()
 {
+    if(mutex_update_ptr == NULL){
+        mutex_update_ptr = new pthread_mutex_t;
+        pthread_mutex_init(mutex_update_ptr,NULL);
+    }
     //Map paramer init
-    m_xRot=m_yRot=m_zRot=0.0;
-    m_xMove=m_yMove=m_zMove=0.0;
-    m_roll = 1.0;
-    map_zoom = MAP_SIZE;
     map_grid_size = MAP_SIZE;
     //Map Data init
-    map_data = NULL;
-    this->map_resolution = 0.05;
     MapDatas.clear();
-    createMapDataPtr(0,0);
     //robot init
-    robot_yaw = 0.0f;
+    robotPose_.clear();
     //robot Goals init
     Goals.clear();
     //Lidar Data
@@ -260,50 +277,70 @@ Map_Model::Map_Model()
     LidarDatas.data.push_back(2.2);
     LidarDatas.angle_increment = 0.058;*/
 }
-
+/*-------------------------------------------------------------------------------------------------------*/
 Map_Model::~Map_Model()
 {
 
 
 }
-
+/*-------------------------------------------------------------------------------------------------------*/
 void Map_Model::init(int w_width,int w_hight)
 {
     this->win_width = w_width;
     this->win_hight = w_hight;
 }
-
+/*-------------------------------------------------------------------------------------------------------*/
 void Map_Model::initGL()
 {
+    m_Camera.SetPos(QVector3D(0.0f,0.0f,10.0f));
+    glShadeModel(GL_SMOOTH);
+    glClearDepth( 1.0 );
     glEnable( GL_MULTISAMPLE );
-    glEnable( GL_DEPTH_TEST );
+    //glEnable( GL_DEPTH_TEST );
+    glDisable(GL_DEPTH_TEST);
+    glDepthFunc( GL_LEQUAL );
     glClearColor (MAP_BACKGROUND_COLOR, MAP_BACKGROUND_COLOR, MAP_BACKGROUND_COLOR, 0.0);
     //glLoadIdentity();
     //glEnable(GL_DEPTH_TEST);///开启深度缓存测试
     printf("initializeGL...\n");
 }
-static unsigned long draw_count = 0;
+
+/*-------------------------------------------------------------------------------------------------------*/
+void Map_Model::resizeGL(int w, int h)
+{
+    printf("w:%dh:%d\n",w,h);
+    m_Camera.SetWindows(w,h);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glViewport(0, 0, (GLsizei)(w), (GLsizei)(h));
+    this->win_hight = h;
+    this->win_width = w;
+
+
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+    /*
+     * fovy: camera scense size
+     * */
+    gluPerspective( 90.0, (GLfloat)(w)/(GLfloat)(h), 0.1f, 100.0 );
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity( );
+    printf("resizeGL...\n");
+}
+/*-------------------------------------------------------------------------------------------------------*/
+//static unsigned long draw_count = 0;
 void Map_Model::drawGL()
 {
-    printf("drawGL..%ld\n",draw_count);
-    draw_count++;
-    //if(draw_count%100 != 0)return ;
-    //glMatrixMode(GL_MODELVIEW);
-    //glLoadIdentity();
-
-    glViewport(0, 0, (GLsizei)(this->win_width), (GLsizei)(this->win_hight));
-    glOrtho(-MAP_SIZE,MAP_SIZE,-MAP_SIZE,MAP_SIZE,-100,100);
-    gluLookAt(0,0,1.0,   0,0,0,    0,1.0,0);
-    glRotatef(m_xRot, 1.0f, 0.0f, 0.0f);
-    glRotatef(m_yRot, 0.0f, 1.0f, 0.0f);
-    glTranslatef(m_xMove,m_yMove,0.0);
-    glScalef(m_roll,m_roll,m_roll);
+    //printf("drawGL..%ld\n",draw_count);
+    //draw_count++;
+    pthread_mutex_lock(mutex_update_ptr);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glLoadIdentity();
+    //glPushMatrix( );
+    m_Camera.Apply();
 
     //------Map------
     if(MapDatas.data.size() > 0){
-        char *p = map_data;
         float color = 0.0;
-        int kk = 0;
         for(int i = 0; i<MapDatas.height; i++)
         {
            for(int j = 0; j<MapDatas.width; j++)
@@ -323,19 +360,17 @@ void Map_Model::drawGL()
                         0.001,
                         MapDatas.resolution,
                         color,color,color);
-               p++;
-               kk++;
            }
         }
-        glFlush();
+        //glFlush();
     }
-    //------Pose------
 
-    if(MapDatas.data.size() > 0)
+    //------Pose------
+    //if(MapDatas.data.size() > 0)
     {
         setStaticPose(0.3,   1.0,0.0,0.0);
 
-        setPose(this->robotPose.x,robotPose.y,robotPose.z + 0.001111f,   0.3,   0.0,0.0,1.0,  this->robotPose.Quaternion);
+        setPose(this->robotPose_.x,robotPose_.y,robotPose_.z + 0.0000001,   0.3,   0.0,0.0,1.0,  this->robotPose_.Quaternion);
     }
     //------Label------
 #if 0
@@ -343,34 +378,31 @@ void Map_Model::drawGL()
     sprintf(buf,"robot pose [%3.2f %3.2f %3.2f]",this->robotPose.x,robotPose.y,robot_yaw);
     m_robot_info_label->setText(buf);
 #endif
+
     //------Goals------
 #if 1
     if(Goals.size()>0){
         std::list<MapWin::POSE>::iterator it = Goals.begin();
         if(1){//robotPose.movebase_status == 1){
-            setGoal(it->x,it->y, 0.0f + 0.0011111f,   0.3,   1.0,0.0,0.0,  NULL);
+            setGoal(it->x,it->y, 0.0f + 0.000002,   0.3,   1.0,0.0,0.0,  NULL);
         }else{
-            setGoal(it->x,it->y, 0.0f + 0.0011111f,   0.3,   1.0,0.0,0.0,  NULL);
+            setGoal(it->x,it->y, 0.0f + 0.000002,   0.3,   1.0,0.0,0.0,  NULL);
         }
         it++;
         for(; it!=Goals.end(); it++)
         {
-            setGoal(it->x,it->y, 0.0f + 0.0011111f,   0.3,   1.0,0.0,0.0,  NULL);
+            setGoal(it->x,it->y, 0.0f + 0.000002,   0.3,   1.0,0.0,0.0,  NULL);
 
         }
     }
 #endif
 
 
-
+    //------Lidar------
     if(LidarDatas.data.size()>0){
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glShadeModel(GL_SMOOTH);
-        //glBegin(GL_LINE_LOOP);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        //glBegin(GL_POLYGON_OFFSET_LINE);
-        //glBegin(GL_POLYGON);
         glColor4f(1.0f, 0.0f, 0.0f,0.3f);
         float lidar_x,lidar_y;
         float lidar_x_old,lidar_y_old;
@@ -385,11 +417,18 @@ void Map_Model::drawGL()
                         this->LidarDatas.pose,
                         LidarDatas.data[i],
                         i*LidarDatas.angle_increment);
+
             glBegin(GL_POLYGON);
-            glVertex3f(lidar_x_old, lidar_y_old, 0.5f);
-            glVertex3f(lidar_x, lidar_y, 0.5f);
-            glVertex3f(this->LidarDatas.pose.x, this->LidarDatas.pose.y, 0.5f);
+            glColor4f(1.0f, 0.0f, 0.0f,0.1f);
+            glVertex2f(lidar_x_old, lidar_y_old);
+            glVertex2f(lidar_x, lidar_y);
+            glVertex2f(this->LidarDatas.pose.x, this->LidarDatas.pose.y);
             glEnd();
+            setPoint(lidar_x ,
+                     lidar_y,
+                     0.001,
+                     MapDatas.resolution*2,
+                     1.0f,0.0f,0.0f);
             lidar_x_old = lidar_x;
             lidar_y_old = lidar_y;
 
@@ -401,63 +440,40 @@ void Map_Model::drawGL()
     glBegin(GL_LINES);
     glColor3f(0.7, 0.7, 0.7);
     int cellcount = map_grid_size;
-    float grid_z = 0.0011;
-           for(int i = -cellcount; i<=cellcount; i++)
-           {
-               glVertex3d(i,cellcount,grid_z);
-               glVertex3d(i,-cellcount,grid_z);
-           }
-           for(int i = -cellcount; i<=cellcount; i++)
-           {
-               glVertex3d(cellcount,i,grid_z);
-               glVertex3d(-cellcount,i,grid_z);
-           }
+    for(int i = -cellcount; i<=cellcount; i++)
+    {
+       glVertex2d(i,cellcount);
+       glVertex2d(i,-cellcount);
+    }
+    for(int i = -cellcount; i<=cellcount; i++)
+    {
+       glVertex2d(cellcount,i);
+       glVertex2d(-cellcount,i);
+    }
     glEnd();
-    glFlush();
+    //glFlush();
 
-
-    glLoadIdentity();
+    //glPopMatrix();
+    pthread_mutex_unlock(mutex_update_ptr);
 }
-
-void Map_Model::resizeGL(int w, int h)
-{
-    /*glViewport(0, 0, (GLsizei)(w), (GLsizei)(h));
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glOrtho((map_zoom*w/h),(map_zoom*w/h),map_zoom,map_zoom,-100,100);*/
-    printf("resizeGL...\n");
-/*
-    m_robot_info_label->setGeometry(10,win_hight-30,win_width-10,20);
-    m_robot_info_label->setText("");
-
-    m_cursor_info_label->setGeometry(10,win_hight-50,win_width-10,20);
-    m_cursor_info_label->setText("");*/
-}
-
-void Map_Model::setMapZoom(float scale)
-{
-    m_roll += scale;
-    if(m_roll <= 0.1)m_roll = 0.1;
-    printf("Roll:%f\n",m_roll);
-}
-
+/*-------------------------------------------------------------------------------------------------------*/
 void Map_Model::addGoal(POSE goalPose)
 {
     this->Goals.push_back(goalPose);
 }
-
+/*-------------------------------------------------------------------------------------------------------*/
 void Map_Model::popGoal()
 {
     if(Goals.size() <= 0) return;
     this->Goals.pop_front();
 }
-
+/*-------------------------------------------------------------------------------------------------------*/
 void Map_Model::popGoalBack()
 {
     if(Goals.size() <= 0) return;
     this->Goals.pop_back();
 }
-
+/*-------------------------------------------------------------------------------------------------------*/
 bool Map_Model::getGoal(POSE &goal)
 {
     if(Goals.size() > 0){
@@ -467,74 +483,53 @@ bool Map_Model::getGoal(POSE &goal)
     return false;
 }
 
-void Map_Model::createMapDataPtr(int w, int h)
-{
-    if(map_data != NULL)
-    {
-        clearMapDataPtr();
-    }
-    map_data = new char[w*h+20];
-    map_width = w;
-    map_hight = h;
-}
-
-void Map_Model::clearMapDataPtr()
-{
-    if(map_data != NULL)
-    {
-        delete [] map_data;
-        map_width = 0;
-        map_hight = 0;
-        map_data = NULL;
-    }
-}
-
+/*-------------------------------------------------------------------------------------------------------*/
 void Map_Model::clearMap()
 {
-    clearMapDataPtr();
     MapDatas.clear();
 }
-
+/*-------------------------------------------------------------------------------------------------------*/
 void Map_Model::updateMap(char *data, int w, int h, float resolution, ST_POSE pose)
 {
-    /*if((w*h > map_width*map_hight))
-    {
-        createMapDataPtr(w,h);
-    }
-    if(map_data == NULL)return;
-    map_width = w;
-    map_hight = h;
-    memcpy(&map_pose,&pose,sizeof(ST_POSE));
-    printf("updateMap x:%f y:%f \n",map_pose.x,map_pose.y);
-    map_resolution = resolution;
-    memcpy(map_data,data,w*h);*/
+    pthread_mutex_lock(mutex_update_ptr);
     MapDatas.clear();
     MapDatas.height = h;
     MapDatas.width = w;
     MapDatas.pushBuf(data,(w*h));
     MapDatas.resolution = resolution;
     MapDatas.pose.FromPOSE(pose);
+    pthread_mutex_unlock(mutex_update_ptr);
 }
 
-
+/*-------------------------------------------------------------------------------------------------------*/
 void Map_Model::updateMap(std::vector<char> data, int w, int h, float resolution, ST_POSE pose)
 {
+    pthread_mutex_lock(mutex_update_ptr);
     MapDatas.clear();
     MapDatas.height = h;
     MapDatas.width = w;
     MapDatas.pushVector(data,(w*h));
     MapDatas.resolution = resolution;
     MapDatas.pose.FromPOSE(pose);
+    pthread_mutex_unlock(mutex_update_ptr);
 }
-
+/*-------------------------------------------------------------------------------------------------------*/
+void Map_Model::GetMap(MapVector &data)
+{
+    pthread_mutex_lock(mutex_update_ptr);
+    data = this->MapDatas;
+    pthread_mutex_unlock(mutex_update_ptr);
+}
+/*-------------------------------------------------------------------------------------------------------*/
 void Map_Model::SaveMap(QString file_name)
 {
+    pthread_mutex_lock(mutex_update_ptr);
     QFile file(file_name);
 
     if (file.open(QIODevice::WriteOnly)) //打开方式：可读、二进制方式
     {
         char buf[125] = {0};
-        sprintf(buf,"[%f,%f,%f,%f,%f,%f,%f]",
+        sprintf(buf,"[%f,%f,%f,%f,%f,%f,%f]\n",
                 MapDatas.pose.x,
                 MapDatas.pose.y,
                 MapDatas.pose.z,
@@ -543,7 +538,7 @@ void Map_Model::SaveMap(QString file_name)
                 MapDatas.pose.Quaternion[2],
                 MapDatas.pose.Quaternion[3]);
         file.write(buf, strlen(buf));
-        sprintf(buf,"[%d,%d,%f]",MapDatas.width,MapDatas.height,MapDatas.resolution);
+        sprintf(buf,"[%d,%d,%f]\n",MapDatas.width,MapDatas.height,MapDatas.resolution);
         file.write(buf, strlen(buf));
         file.write("[", 1);
 
@@ -557,11 +552,77 @@ void Map_Model::SaveMap(QString file_name)
 
         file.close();
     }
+    pthread_mutex_unlock(mutex_update_ptr);
 }
 
+void Map_Model::LoadMap(QString file_name)
+{
+    pthread_mutex_lock(mutex_update_ptr);
+    QFile file(file_name);
+
+    while (file.open(QIODevice::ReadOnly)) //打开方式：可读、二进制方式
+    {
+        MapDatas.clear();
+        //----- pose
+        QByteArray line_poae = file.readLine();
+        line_poae.remove(0,1);
+        line_poae.remove(line_poae.size()-2,2);
+        QString str_pose(line_poae);
+
+        printf("line1:%s\n",str_pose.toStdString().c_str());
+        QStringList pose_list = str_pose.split(",");
+        if(pose_list.size() < 7) break;
+        MapDatas.pose.x = pose_list[0].toFloat();
+        MapDatas.pose.y = pose_list[1].toFloat();
+        MapDatas.pose.z = pose_list[2].toFloat();
+        MapDatas.pose.Quaternion[0] = pose_list[3].toFloat();
+        MapDatas.pose.Quaternion[1] = pose_list[4].toFloat();
+        MapDatas.pose.Quaternion[2] = pose_list[5].toFloat();
+        MapDatas.pose.Quaternion[3] = pose_list[6].toFloat();
+        for(int i = 0; i < pose_list.size(); i++){
+            printf(":%s\n",pose_list[i].toStdString().c_str());
+        }
+
+        //----- paramer
+        QByteArray line_paramer = file.readLine();
+        line_paramer.remove(0,1);
+        line_paramer.remove(line_paramer.size()-2,2);
+        QString paramer_str(line_paramer);
+
+        printf("line2:%s\n",paramer_str.toStdString().c_str());
+        QStringList paramer_list = paramer_str.split(",");
+        if(paramer_list.size() < 3) break;
+        MapDatas.width = paramer_list[0].toInt();
+        MapDatas.height = paramer_list[1].toInt();
+        MapDatas.resolution = paramer_list[2].toFloat();
+        for(int i = 0; i < paramer_list.size(); i++){
+            printf(":%s\n",paramer_list[i].toStdString().c_str());
+        }
+
+        //----- data
+        QByteArray line_data = file.readLine();
+        line_data.remove(0,1);
+        line_data.remove(line_data.size()-1,2);
+        QString data_str(line_data);
+
+        printf("line3:%s\n",paramer_str.toStdString().c_str());
+        QStringList data_list = data_str.split(" ");
+        if(data_list.size() < (MapDatas.width*MapDatas.height)) break;
+        std::vector<char> _data;
+        for(int i = 0; i < data_list.size(); i++){
+            _data.push_back((char)(data_list[i].toInt()));
+        }
+        MapDatas.pushVector(_data);
+        printf("LoadMap end\n");
+        break;
+    }
+    file.close();
+    pthread_mutex_unlock(mutex_update_ptr);
+}
+/*-------------------------------------------------------------------------------------------------------*/
 void Map_Model::updateRobot(STATUS_PACKAGE_ACK pose)
 {
-
+    pthread_mutex_lock(mutex_update_ptr);
     // is goal areach?
     if( Goals.size()>0 && MapWin::calc_distance(Goals.begin()->x - pose.x, Goals.begin()->y - pose.y) < 0.4f ){
         this->popGoal();
@@ -569,20 +630,20 @@ void Map_Model::updateRobot(STATUS_PACKAGE_ACK pose)
         ctl->OnSendGoal();
     }
 
-    memcpy(&this->robotPose,&pose,sizeof(ST_POSE));
-    //if(robotPose.movebase_status == 1)printf("action movebase...\n");
-    MapWin::Quaternion_to_angle(robot_yaw, robotPose.Quaternion);
-    robotPose_.FromPOSE(robotPose);
-    robot_yaw = robot_yaw*57.295779;
-}
+    robotPose_.FromPOSE(pose);
 
+    pthread_mutex_unlock(mutex_update_ptr);
+}
+/*-------------------------------------------------------------------------------------------------------*/
 void Map_Model::updateLidarData(std::vector<float> vec, float angle_min,float angle_max,float angle_increment,ST_POSE pose)
 {
+    pthread_mutex_lock(mutex_update_ptr);
     LidarDatas.clear();
     LidarDatas.angle_increment = angle_increment;
     LidarDatas.angle_max = angle_max;
     LidarDatas.angle_min = angle_min;
     LidarDatas.pushVector(vec);
-    LidarDatas.pose.FromPOSE(pose);
+    LidarDatas.pose.FromPOSE(pose);\
+    pthread_mutex_unlock(mutex_update_ptr);
 }
 

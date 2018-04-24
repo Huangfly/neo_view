@@ -5,8 +5,8 @@
 using namespace Win;
 using namespace MapTcp;
 
-MapTcp::TcpTaskLidar::TcpTaskLidar(QString ip, QString port, QObject *parent):
-    TcpTaskBase(ip,port,parent)
+MapTcp::TcpTaskLidar::TcpTaskLidar(QObject *parent):
+    TcpTaskBase(parent)
 {
     isThreadRunning = false;
     lidar_Data.clear();
@@ -23,7 +23,10 @@ void TcpTaskLidar::run()
     map_main *ctl = Win::GetMainWin();
 
     this->isThreadRunning = true;
-    if(!this->p_socket->connectSocket(this)) return;
+    if(!this->p_socket->connectSocket(this)) {
+        this->isThreadRunning = false;
+        return;
+    }
 
     unsigned char str[50] = {0};
     unsigned char ack[2200] = {0};

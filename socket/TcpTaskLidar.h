@@ -9,7 +9,7 @@ namespace MapTcp {
     class TcpTaskLidar : public TcpTaskBase
     {
     public:
-        TcpTaskLidar(QString ip,QString port,QObject *parent = 0);
+        TcpTaskLidar(QObject *parent = 0);
         ~TcpTaskLidar();
         void startThread(){ if(!isRunning()) this->start(); }
         bool isRunning(void){ return isThreadRunning; }

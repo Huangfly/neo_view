@@ -9,6 +9,9 @@
 #define PACK_NODECTL	5 //
 #define PACK_CMDVEL     8 //
 #define PACK_LIDAR      9 //
+#define PACK_LOADMAP    10//
+
+#define LOADMAP_PACKAGE_SIZE    512
 
 typedef struct {
     float x;
@@ -115,6 +118,26 @@ typedef struct {
     unsigned int package_sum;// map package total sum.
     unsigned int package_num;// map package num.
 }LIDAR_PACKAGE_POP;
+
+typedef struct {
+    unsigned int serial_num;
+    unsigned int package_sum;// map package total sum.
+    unsigned int package_num;// map package num.
+    ST_POSE map_pose;
+    unsigned int width;
+    unsigned int height;
+    float resolution;
+    unsigned int data_size;
+    unsigned char data[LOADMAP_PACKAGE_SIZE];
+} LOADMAP_PACKAGE_POP;
+
+
+typedef struct {
+    unsigned int serial_num;
+    unsigned int package_sum;// map package total sum.
+    unsigned int package_num;// map package num.
+} LOADMAP_PACKAGE_ACK;
+
 
 #endif // MAP_SOCKET_TYPE
 

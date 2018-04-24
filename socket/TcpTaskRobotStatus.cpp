@@ -5,8 +5,8 @@
 using namespace MapTcp;
 //bool TcpTaskRobotStatus::isRunOnRobotStatus = false;
 
-TcpTaskRobotStatus::TcpTaskRobotStatus(QString ip,QString port,QObject *parent):
-    TcpTaskBase(ip,port,parent)
+TcpTaskRobotStatus::TcpTaskRobotStatus(QObject *parent):
+    TcpTaskBase(parent)
 {
     isThreadRunning = false;
     //connect(this,SIGNAL(finished()),this,SLOT(deleteLater()));
@@ -22,7 +22,10 @@ void TcpTaskRobotStatus::run()
     map_main *main_ptr = Win::GetMainWin();
 
     this->isThreadRunning = true;
-    if(!this->p_socket->connectSocket(this)) return;
+    if(!this->p_socket->connectSocket(this)) {
+        this->isThreadRunning = false;
+        return;
+    }
 
 
     do{

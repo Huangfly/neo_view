@@ -2,6 +2,7 @@
 #define MAP_MAIN_H
 
 #include <QWidget>
+#include <QGridLayout>
 #include <QtNetwork/QTcpSocket>
 #include <QtNetwork/QAbstractSocket>
 //#include <Sock>
@@ -40,22 +41,20 @@ public:
     void actionRobot();
     void lockRobot();
 
-    QString sysIP;
-    QString sysPort;
     QTimer *m_robot_timer;
     unsigned int timerCount;
     STATUS_PACKAGE_ACK m_robot_status;
-    //QWidget *m_map_view_ctl;
-    //QWidget *m_map_menu_ctl;
     ManagerSocket *m_socketMag;
 
     MapWin::Map_Control m_MapViewCtl;
     MapWin::Map_Model m_MapViewModle;
 protected:
+    void keyPressEvent(QKeyEvent *event);
+    void resizeEvent(QResizeEvent* size);
 private:
     Ui::map_main *ui;
-
-
+    QGridLayout *mLayout;
+    bool mFullScreen;
     bool isActionRobot;
 };
 

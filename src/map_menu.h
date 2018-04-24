@@ -13,15 +13,17 @@ class map_menu : public QTabWidget
 {
     Q_OBJECT
 public slots:
-    void OnPatrol();
+    void OnNav_Mapping();
     void OnNav_NavigationMode();
     void OnNav_ExploreMode();
+    void OnNav_Location();
     void OnClearGoals();
 
 
     void OnEditChange();
 
     void OnSlam_SaveMap();
+    void OnSlam_LoadMap();
     void OnSlam_ClearMap();
 
     void OnAction_BtnPress();
@@ -44,5 +46,6 @@ private:
     CMDVEL_PACKAGE_POP cmdvel_body;
     QTimer *m_cmdvel_timer;
 };
+
 
 #endif // MAP_MENU_H

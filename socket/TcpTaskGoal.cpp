@@ -4,8 +4,8 @@
 
 using namespace MapTcp;
 
-MapTcp::TcpTaskGoal::TcpTaskGoal(QString ip, QString port, QObject *parent):
-    TcpTaskBase(ip,port,parent)
+MapTcp::TcpTaskGoal::TcpTaskGoal(QObject *parent):
+    TcpTaskBase(parent)
 {
 }
 
@@ -33,7 +33,9 @@ void TcpTaskGoal::run()
     char pop_buf[80];
     char ack_buf[80];
 
-    this->p_socket->connectSocket(this);
+    if( !this->p_socket->connectSocket(this) ){
+        return;
+    }
     if(this->isSendGoal){
         map_main *ctl = Win::GetMainWin();
         P_HEAD *head = (P_HEAD*)(pop_buf+1);

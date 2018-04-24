@@ -2,8 +2,8 @@
 
 using namespace MapTcp;
 
-TcpTaskCmdVel::TcpTaskCmdVel(QString ip,QString port,QObject *parent):
-    TcpTaskBase(ip,port,parent)
+TcpTaskCmdVel::TcpTaskCmdVel(QObject *parent):
+    TcpTaskBase(parent)
 {
     isThreadRunning = false;
 }
@@ -20,7 +20,10 @@ void MapTcp::TcpTaskCmdVel::run()
     char ack_buf[80];
 
     this->isThreadRunning = true;
-    if(!this->p_socket->connectSocket(this)) return;
+    if(!this->p_socket->connectSocket(this)) {
+        this->isThreadRunning = false;
+        return;
+    }
 
     P_HEAD *head = (P_HEAD*)(pop_buf+1);
     CMDVEL_PACKAGE_POP *pop_package = (CMDVEL_PACKAGE_POP*)(pop_buf+1+sizeof(P_HEAD));

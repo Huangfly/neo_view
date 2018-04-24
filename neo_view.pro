@@ -28,7 +28,10 @@ SOURCES += \
     src/ManagerSocket.cpp \
     socket/TcpTaskActionNode.cpp \
     socket/TcpTaskGoal.cpp \
-    socket/TcpTaskLidar.cpp
+    socket/TcpTaskLidar.cpp \
+    src/Camera.cpp \
+    socket/TcpTaskLoadMap.cpp \
+    socket/TcpPacket.cpp
 
 HEADERS  += src/map_main.h \
     src/map_menu.h \
@@ -45,7 +48,10 @@ HEADERS  += src/map_main.h \
     src/ManagerSocket.h \
     socket/TcpTaskActionNode.h \
     socket/TcpTaskGoal.h \
-    socket/TcpTaskLidar.h
+    socket/TcpTaskLidar.h \
+    src/Camera.h \
+    socket/TcpTaskLoadMap.h \
+    socket/TcpPacket.h
 
 FORMS    += \
     src/map_menu.ui \

@@ -5,8 +5,8 @@
 using namespace MapTcp;
 using namespace Win;
 
-TcpTaskDownloadMap::TcpTaskDownloadMap(QString ip,QString port,QObject *parent):
-    TcpTaskBase(ip,port,parent)
+TcpTaskDownloadMap::TcpTaskDownloadMap(QObject *parent):
+    TcpTaskBase(parent)
 {
     isThreadRunning = false;
     map_Data = NULL;
@@ -26,7 +26,10 @@ void TcpTaskDownloadMap::run()
     map_main *map_main_ptr = Win::GetMainWin();
 
     this->isThreadRunning = true;
-    if(!this->p_socket->connectSocket(this)) return;
+    if(!this->p_socket->connectSocket(this)) {
+        this->isThreadRunning = false;
+        return;
+    }
 
     unsigned char str[50] = {0};
     unsigned char ack[800] = {0};
@@ -42,17 +45,12 @@ void TcpTaskDownloadMap::run()
     str[1+16+8+1]=0xAB;
 
     do{
-        //sleep(1);
-        //printf("send : \n id:%d  size:%d\n",head->funcId,head->size);
-        //printf("sum:%d num:%d\n",map_pop->package_sum,map_pop->package_num);
-
         p_socket->write((char*)str,head->size+9);
         if(!p_socket->waitForBytesWritten()){
             printf("send() error\n");
             break;
         }
 
-        //printf("wait ack...\n");
         int ret = 0;
         bool result = false;
         result = p_socket->waitForReadyRead(5000);
@@ -74,13 +72,7 @@ void TcpTaskDownloadMap::run()
             for(unsigned int i = 0; i<512; i++){
                 MapDatas.push_back(map_ack->data[i]);
             }
-/*
-            if( map_Data_len <  (map_ack->package_sum*512) ){
-                if(map_Data != NULL) delete [] map_Data;
-                    DataPos = map_Data = new char[map_ack->package_sum*512+10];
-                map_Data_len = map_ack->package_sum*512;
-            }
-            memcpy(DataPos,map_ack->data,512);*/
+
             DataPos += 512;
             if (map_pop->package_sum <= map_pop->package_num)
             {
@@ -92,7 +84,6 @@ void TcpTaskDownloadMap::run()
             printf("ack fail.\n");
             break;
         }
-        //closesocket(p_socket);
     }while(map_pop->package_sum != 0 && map_pop->package_sum >= map_ack->package_num);
 
     //printf("map ack w:%d h:%d size:%d recv:%d\n",map_ack->width,map_ack->hight,map_ack->size,(int)(DataPos-map_Data));

@@ -4,11 +4,11 @@ using namespace MapTcp;
 
 static pthread_mutex_t *mutex_socket_ptr = NULL;
 
-TcpSocket::TcpSocket(QString ip,QString port,QObject *parent):
+TcpSocket::TcpSocket(QObject *parent):
     QTcpSocket(parent)
 {
-    this->sysIP = ip;
-    this->sysPort = port;
+    this->sysIP = "127.0.0.1";
+    this->sysPort = "8888";
     m_bServerConnected = false;
     //this->setPeerPort();
     if(mutex_socket_ptr == NULL){

@@ -35,6 +35,36 @@ void map_main::lockRobot()
     this->m_robot_timer->stop();
 }
 
+void map_main::keyPressEvent(QKeyEvent *event)
+{
+    switch(event->key())
+    {
+        case Qt::Key_F2:
+        {
+            mFullScreen = !mFullScreen;
+            if(mFullScreen){
+                this->showFullScreen();
+            }else{
+                this->showNormal();
+            }
+
+            //ui->_map_view->FullScreen();
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void map_main::resizeEvent(QResizeEvent *size)
+{
+    QSize mapViewSize = QSize(size->size().width(),size->size().height()-100);
+    QSize menuViewSize = QSize(size->size().width(),100);
+    printf("MainWin resize\n");
+    ui->_map_view->resize(mapViewSize);
+    ui->_map_menu->resize(menuViewSize);
+}
+
 void map_main::OnLockRobot()
 {
     if(ui->pushButton_1->isChecked())
@@ -99,8 +129,6 @@ void map_main::OnCancelMove()
 
 map_main::map_main(QWidget *parent) :
     QWidget(parent),
-    sysIP("192.168.1.121"),
-    sysPort("8888"),
     m_MapViewCtl(),
     m_MapViewModle(),
     ui(new Ui::map_main)
@@ -108,8 +136,8 @@ map_main::map_main(QWidget *parent) :
     ui->setupUi(this);
     setWindowFlags(windowFlags()& ~Qt::WindowMaximizeButtonHint);
     //setWindowFlags(windowFlags() &~ (Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint));
-    setFixedSize(this->width(), this->height());
-
+    //setFixedSize(this->width(), this->height());
+    mFullScreen = false;
     ui->_map_menu->init(this, ui->_map_view);
     //this->m_map_view_ctl = ui->_map_view;
     //this->m_map_menu_ctl = ui->_map_menu;
@@ -136,6 +164,9 @@ map_main::map_main(QWidget *parent) :
     this->m_MapViewCtl.init(ui->_map_view,&this->m_MapViewModle);
     this->m_MapViewCtl.create();
 
+    //mLayout = new QGridLayout;
+
+
     timerCount = 0;
 
 }
@@ -148,7 +179,7 @@ map_main::~map_main()
 
 void map_main::OnActivateNode(QString str,bool enable)
 {
-    if(!this->isActionRobot)return;
+    //if(!this->isActionRobot)return;
     m_socketMag->OnActivateNode(str,enable);
     //printf("%s.\n",str.c_str());
 }

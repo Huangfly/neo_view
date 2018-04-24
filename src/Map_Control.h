@@ -37,6 +37,7 @@ namespace MapWin {
         void updateMap(char *data,int w,int h, float resolution,ST_POSE pose);
         void updateMap(std::vector<char> data,int w,int h, float resolution,ST_POSE pose);
         void clearMap();
+        void LoadMap(QString file_name);
         void SaveMap(QString file_name);
 
         void updateRobotPose(STATUS_PACKAGE_ACK pose);

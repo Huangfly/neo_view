@@ -10,6 +10,7 @@
 #include <math.h>
 #include <string.h>
 #include "map_socket_type.h"
+#include "Camera.h"
 
 namespace MapWin {
 
@@ -36,6 +37,15 @@ namespace MapWin {
             x = 0.0f;y = 0.0f; z = 0.0f;
             memset(Quaternion,0,sizeof(Quaternion));
             Quaternion[3] = 1.0f;
+        }
+
+        void ToPOSE(ST_POSE *pop){
+
+            pop->x = x;
+            pop->y = y;
+            pop->z = z;
+
+            memcpy(pop->Quaternion,Quaternion,sizeof(Quaternion));
         }
 
         void FromPOSE(STATUS_PACKAGE_ACK pop){
@@ -131,6 +141,25 @@ namespace MapWin {
             }
         }
 
+        unsigned int copyToBuf(char *buf, unsigned int start, unsigned int end){
+            unsigned int i = 0;
+            if(end > data.size()) return 0;
+            for( i = start; i< end; i++){
+                buf[i-start] = this->data[i];
+            }
+            return end - start;
+        }
+
+        MapVector& operator=(const MapVector right)
+        {
+            this->width = right.width;
+            this->height = right.height;
+            this->resolution = right.resolution;
+            this->pose = right.pose;
+            this->data = right.data;
+            return *this;
+        }
+
         int width;
         int height;
         float resolution;
@@ -171,22 +200,7 @@ namespace MapWin {
 
 
         //OpenGL camera
-        void setMapZoom(float scale);
-        float getZoom(){ return map_zoom; }
-        void getMoveXY(float &x,float &y){ x = m_xMove; y = m_yMove; }
-        void addMoveXY(float x,float y){ m_xMove += x; m_yMove += y; }
-        float getRoll(){ return m_roll; }
-        void setRoll(float scale){ m_roll += scale; if(m_roll <= 0.1) m_roll = 0.1; }
-        void globalpose_to_mappose(float &x, float &y)
-        {
-            float dx = x;
-            float dy = y;
-
-            x = ( (dx-win_width/2.0f)/(win_width/map_zoom/2.0f) - m_xMove )/m_roll;
-            y = ( (win_hight/2.0f-dy)/(win_hight/map_zoom/2.0f) - m_yMove )/m_roll;
-
-        }
-        void moveMap(float x, float y){ m_xMove += x; m_yMove += y; }
+        Camera& GetCamera(){ return m_Camera; }
 
         //Goal
         void addGoal(MapWin::POSE goalPose);
@@ -197,20 +211,17 @@ namespace MapWin {
         void clearGoals(){ this->Goals.clear(); }
 
         //Map
-        void createMapDataPtr(int w, int h);
-        void clearMapDataPtr();
         void clearMap();
         void updateMap(char *data, int w, int h, float resolution,ST_POSE pose);
         void updateMap(std::vector<char> data, int w, int h, float resolution,ST_POSE pose);
+        void GetMap(MapWin::MapVector &data);
         void SaveMap(QString file_name);
+        void LoadMap(QString file_name);
 
         //Robot Pose
         void updateRobot(STATUS_PACKAGE_ACK pose);
         void getRobotPose(MapWin::POSE &pose){
-            pose.x = robotPose.x;
-            pose.y = robotPose.y;
-            pose.z = robotPose.z;
-            memcpy(pose.Quaternion,robotPose.Quaternion,sizeof(pose.Quaternion));
+            pose = robotPose_;
         }
         //
         void updateLidarData(std::vector<float> vec, float angle_min,float angle_max,float angle_increment,ST_POSE pose);
@@ -218,10 +229,8 @@ namespace MapWin {
     protected:
     private:
         //windows paramer
+        Camera m_Camera;
         int win_width,win_hight;
-        float map_zoom;
-        float m_xRot,m_yRot,m_zRot;
-        float m_xMove,m_yMove,m_zMove,m_roll;
 
         // members
         bool mouseLeftDown;
@@ -234,19 +243,13 @@ namespace MapWin {
 
         //map grid
         int map_grid_size;
+        pthread_mutex_t *mutex_update_ptr = NULL;
 
         //map
-        char *map_data;
         MapWin::MapVector MapDatas;
-        int map_width;
-        int map_hight;
-        float map_resolution;
-        ST_POSE map_pose;
 
         //robot pose
-        ST_POSE robotPose;
         MapWin::POSE robotPose_;
-        float robot_yaw;
 
         //Goals
         std::list<MapWin::POSE> Goals;

@@ -75,12 +75,13 @@ void Map_Control::mouseWheel(QWheelEvent *event)
     if(isLockMove)return;
     float rolldistance=event->delta();
 
-    if(model_->getRoll() < 1.0f){
+    /*if(model_->getRoll() > 1.0f){
         rolldistance = rolldistance/10.0f;
-    }
-    float scale=rolldistance/1000.0;
-    this->model_->setRoll(scale);
-    this->view_->updateUI();
+    }*/
+    float scale=rolldistance/100.0;
+    printf("scale:%f\n",scale);
+    this->model_->GetCamera().ZoomIn(scale);
+    this->view_->emitUpdateUI();
 }
 
 void Map_Control::mousePress(QMouseEvent *event)
@@ -94,19 +95,17 @@ void Map_Control::mousePress(QMouseEvent *event)
         }else{
             model_->getRobotPose(pre_goal);
         }
-        float dx = (float)event->x();
-        float dy = (float)event->y();
-        model_->globalpose_to_mappose(dx,dy);
-        goal.x = dx;
-        goal.y = dy;
+        QVector2D pos = model_->GetCamera().GetPosFromWindows(event->x(),event->y());
+        goal.x = pos.x();
+        goal.y = pos.y();
         goal.z = 0.0f;
         float angle = atan2f((goal.y - pre_goal.y), (goal.x - pre_goal.x));
         angle_to_Quaternion(angle, goal.Quaternion);
         this->model_->addGoal(goal);
-        this->view_->updateUI();
+        this->view_->emitUpdateUI();
     }else if( isSetGoal && (event->buttons() & Qt::RightButton) ){
         this->model_->popGoalBack();
-        this->view_->updateUI();
+        this->view_->emitUpdateUI();
     }
 }
 
@@ -116,15 +115,17 @@ void Map_Control::mouseMove(QMouseEvent *event)
     float dy = (float)event->y();
     float nx = (float)mouse_LastPos.x();
     float ny = (float)mouse_LastPos.y();
-    model_->globalpose_to_mappose(dx,dy);
-    model_->globalpose_to_mappose(nx,ny);
 
+    //printf("move:%f,%f\n",(dx-nx),(dy-ny));
     if (event->buttons() & Qt::LeftButton && !isLockMove)
     {
-        model_->moveMap( ( (dx-nx)*model_->getRoll() ), ( (dy-ny)*model_->getRoll() ) );
+        model_->GetCamera().SetPosFromWindows(-(dx-nx),(dy-ny));
+    }else if(event->buttons() & Qt::RightButton && !isLockMove){
+        model_->GetCamera().SetHorizontalAngle(dx-nx);
     }
-    view_->showCursorPoseLabel(dx,dy);
-    //view_->updateUI();
+    QVector2D pos = model_->GetCamera().GetPosFromWindows(dx,dy);
+    view_->showCursorPoseLabel(pos.x(),pos.y());
+    view_->emitUpdateUI();
 
     mouse_LastPos = event->pos();
 
@@ -150,6 +151,12 @@ void Map_Control::updateMap(std::vector<char> data, int w, int h, float resoluti
 void Map_Control::clearMap()
 {
     model_->clearMap();
+    view_->emitUpdateUI();
+}
+
+void Map_Control::LoadMap(QString file_name)
+{
+    model_->LoadMap(file_name);
     view_->emitUpdateUI();
 }
 

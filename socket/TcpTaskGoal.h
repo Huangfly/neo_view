@@ -8,7 +8,7 @@ namespace MapTcp {
     {
         Q_OBJECT
     public:
-        TcpTaskGoal(QString ip,QString port,QObject *parent = 0);
+        TcpTaskGoal(QObject *parent = 0);
         ~TcpTaskGoal();
         void startSendGoalThread();
         void startCancelGoalThread();

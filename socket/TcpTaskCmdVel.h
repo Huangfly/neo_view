@@ -10,7 +10,7 @@ namespace MapTcp {
     {
         Q_OBJECT
     public:
-        TcpTaskCmdVel(QString ip,QString port,QObject *parent = 0);
+        TcpTaskCmdVel(QObject *parent = 0);
         ~TcpTaskCmdVel();
         void startThread(float x, float y, float z){
 

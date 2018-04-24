@@ -2,6 +2,8 @@
 #include "ui_map_menu.h"
 #include "main.h"
 #include "map_main.h"
+#include <QFileDialog>
+#include <QMessageBox>
 
 using namespace Win;
 
@@ -12,24 +14,30 @@ extern QString sysPort;
 #define NODE_OFF 0
 
 
-void map_menu::OnPatrol()
+void map_menu::OnNav_Mapping()
 {
-    if(ui->PatrolCTL->isChecked())
+    map_main* ctl = Win::GetMainWin();
+    if( ui->Nav_MappingMode->isChecked() )
     {
-        ui->PatrolCTL->setText("Patrol\non");
-        this->isPatrol = true;
+        if( !ui->Nav_NavigationMode->isChecked() ){
+            ctl->OnActivateNode("mapping",1);
+            ctl->actionRobot();
+        }else{
+             ui->Nav_MappingMode->setChecked(false);
+        }
     }
     else
     {
-        ui->PatrolCTL->setText("Patrol\noff");
-        this->isPatrol = false;
+        ctl->OnActivateNode("mapping",0);
+        ctl->lockRobot();
     }
 }
 
 void map_menu::OnNav_NavigationMode()
 {
     if(ui->Nav_NavigationMode->isChecked()){
-        if(!ui->Nav_ExploreMode->isChecked()){
+        if(!ui->Nav_ExploreMode->isChecked()
+            && !ui->Nav_MappingMode->isChecked()){
             m_map_main_ctl->actionRobot();
             m_map_main_ctl->OnActivateNode("navigation",1);
         }else{
@@ -37,19 +45,31 @@ void map_menu::OnNav_NavigationMode()
         }
 
     }else{
-        //m_map_main_ctl->OnActivateNode("navigation",0);
+        m_map_main_ctl->OnActivateNode("navigation",0);
         m_map_main_ctl->lockRobot();
     }
 }
 
 void map_menu::OnNav_ExploreMode()
 {
+    map_main* ctl = Win::GetMainWin();
     if(ui->Nav_ExploreMode->isChecked()
-        && ui->Nav_NavigationMode->isChecked()){
-        m_map_main_ctl->OnActivateNode("explore",1);
+        && ui->Nav_MappingMode->isChecked()){
+        ctl->OnActivateNode("explore",1);
     }else{
         ui->Nav_ExploreMode->setChecked(false);
-        m_map_main_ctl->OnActivateNode("explore",0);
+        ctl->OnActivateNode("explore",0);
+    }
+}
+
+void map_menu::OnNav_Location()
+{
+    if(ui->Nav_Location->isChecked()
+        && ui->Nav_NavigationMode->isChecked()){
+        m_map_main_ctl->OnActivateNode("location",1);
+    }else{
+        ui->Nav_Location->setChecked(false);
+        m_map_main_ctl->OnActivateNode("location",0);
     }
 }
 
@@ -66,21 +86,30 @@ void map_menu::OnClearGoals()
 
 void map_menu::OnEditChange()
 {
-    if(!ui->lineEdit_IP->text().isEmpty())
-      sysIP = ui->lineEdit_IP->text();
-    if(!ui->lineEdit_Port->text().isEmpty())
-      sysPort = ui->lineEdit_Port->text();
+    if(ui->lineEdit_IP->text().isEmpty() || ui->lineEdit_Port->text().isEmpty() )
+      return;
 
     map_main *ctl = Win::GetMainWin();
     if(ctl != NULL)
-        ctl->m_socketMag->setIpPort(sysIP,sysPort);
-    //ui->lineEdit_IP->
+        ctl->m_socketMag->setIpPort(ui->lineEdit_IP->text(),ui->lineEdit_Port->text());
 }
 
 void map_menu::OnSlam_SaveMap()
 {
     map_main* ctl = Win::GetMainWin();
     ctl->m_MapViewCtl.SaveMap("aaa.map");
+}
+
+void map_menu::OnSlam_LoadMap()
+{
+    QString path = QFileDialog::getOpenFileName(this, tr("Open MapFile"), ".", tr("Map Files(*.map)"));
+    if(path.length() == 0) {
+        QMessageBox::information(NULL, tr("Path"), tr("You didn't select any files."));
+    } else {
+        map_main* ctl = Win::GetMainWin();
+        ctl->m_MapViewCtl.LoadMap(path);
+        ctl->m_socketMag->OnLoadMap();
+    }
 }
 
 void map_menu::OnSlam_ClearMap()
@@ -167,18 +196,20 @@ map_menu::map_menu(QWidget *parent) :
     connect(ui->action_forward,SIGNAL(released()),this,SLOT(OnAction_BtnRelease()));
     connect(ui->action_back,SIGNAL(released()),this,SLOT(OnAction_BtnRelease()));
 
-    connect(ui->PatrolCTL,SIGNAL(clicked()),this,SLOT(OnPatrol()));
+    connect(ui->Nav_MappingMode,SIGNAL(clicked()),this,SLOT(OnNav_Mapping()));
     connect(ui->Nav_NavigationMode,SIGNAL(clicked()),this,SLOT(OnNav_NavigationMode()));
     connect(ui->Nav_ExploreMode,SIGNAL(clicked()),this,SLOT(OnNav_ExploreMode()));
+    connect(ui->Nav_Location,SIGNAL(clicked()),this,SLOT(OnNav_Location()));
     connect(ui->clearGoals,SIGNAL(clicked()),this,SLOT(OnClearGoals()));
 
     connect(ui->slam_savemap,SIGNAL(clicked()),this,SLOT(OnSlam_SaveMap()));
+    connect(ui->slam_loadMap,SIGNAL(clicked()),this,SLOT(OnSlam_LoadMap()));
     connect(ui->slam_clearMap,SIGNAL(clicked()),this,SLOT(OnSlam_ClearMap()));
 
     connect(ui->lineEdit_IP,SIGNAL(textChanged(QString)),this,SLOT(OnEditChange()));
     connect(ui->lineEdit_Port,SIGNAL(textChanged(QString)),this,SLOT(OnEditChange()));
 
-    this->isPatrol = ui->PatrolCTL->isChecked();
+    this->isPatrol = ui->Nav_MappingMode->isChecked();
     m_cmdvel_timer = new QTimer(this);
 }
 
@@ -192,6 +223,6 @@ void map_menu::init(map_main *p, Map_View *pp)
     this->m_map_main_ctl = p;
     this->m_map_view_ctl = pp;
 
-    ui->lineEdit_IP->setText(sysIP);
-    ui->lineEdit_Port->setText(sysPort);
+    ui->lineEdit_IP->setText(ManagerSocket::sysIP);
+    ui->lineEdit_Port->setText(ManagerSocket::sysPort);
 }

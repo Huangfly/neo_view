@@ -5,17 +5,12 @@
 using namespace MapTcp;
 
 QTcpSocket *pt_socket = NULL;
-QString sysIP = "192.168.1.127";
-QString sysPort = "8888";
+QString ManagerSocket::sysIP = "192.168.1.125";
+QString ManagerSocket::sysPort = "8888";
 
-ManagerSocket::ManagerSocket():
-    ThreadRobotStatus(sysIP,sysPort),
-    ThreadDownloadMap(sysIP,sysPort),
-    ThreadActionNode(sysIP,sysPort),
-    ThreadGoal(sysIP,sysPort),
-    ThreadLidar(sysIP,sysPort),
-    ThreadCmdVel(sysIP,sysPort)
+ManagerSocket::ManagerSocket()
 {
+    setIpPort(sysIP,sysPort);
 }
 
 void ManagerSocket::OnDownloadMap()
@@ -54,14 +49,22 @@ void ManagerSocket::OnDownloadLidarData()
     this->ThreadLidar.startThread();
 }
 
+void ManagerSocket::OnLoadMap()
+{
+    this->ThreadLoadMap.startThread();
+}
+
 void ManagerSocket::setIpPort(QString ip, QString port)
 {
+    this->sysIP = ip;
+    this->sysPort = port;
     this->ThreadActionNode.p_socket->setIpPort(ip,port);
     this->ThreadCmdVel.p_socket->setIpPort(ip,port);
     this->ThreadDownloadMap.p_socket->setIpPort(ip,port);
     this->ThreadGoal.p_socket->setIpPort(ip,port);
     this->ThreadLidar.p_socket->setIpPort(ip,port);
     this->ThreadRobotStatus.p_socket->setIpPort(ip,port);
+    this->ThreadLoadMap.p_socket->setIpPort(ip,port);
 }
 
 

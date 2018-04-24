@@ -9,7 +9,7 @@ namespace MapTcp {
     {
         Q_OBJECT
     public:
-        TcpTaskDownloadMap(QString ip,QString port,QObject *parent = 0);
+        TcpTaskDownloadMap(QObject *parent = 0);
         ~TcpTaskDownloadMap();
         void startThread(){ if(!isRunning()) this->start(); }
         bool isRunning(void){ return isThreadRunning; }

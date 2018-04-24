@@ -8,7 +8,7 @@ namespace MapTcp {
     {
         Q_OBJECT
     public:
-        TcpTaskActionNode(QString ip,QString port,QObject *parent = 0);
+        TcpTaskActionNode(QObject *parent = 0);
         ~TcpTaskActionNode();
         void startThread(QString str,bool enable){
 

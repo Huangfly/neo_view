@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QOpenGLWidget>
+#include <QOpenGLFunctions>
 #include <QFile>
 #include <QLabel>
 #include <GL/gl.h>
@@ -23,7 +24,7 @@ class Map_View;
 namespace MapWin {
 
 
-    class Map_View : public QOpenGLWidget
+    class Map_View : public QOpenGLWidget//, protected QOpenGLFunctions
     {
         Q_OBJECT
     public slots:
@@ -33,6 +34,7 @@ namespace MapWin {
         ~Map_View();
 
         void showCursorPoseLabel(float x,float y);
+        void FullScreen();
 
 
         void emitUpdateUI();
@@ -48,6 +50,10 @@ namespace MapWin {
         QWidget *main_view_ctl;
         QLabel *m_robot_info_label;
         QLabel *m_cursor_info_label;
+
+        //QMatrix4x4 m_projection;
+
+        //QMatrix4x4 m_modelView;
 
 /*
         float view_resolution;
@@ -75,8 +81,11 @@ namespace MapWin {
         void mousePressEvent(QMouseEvent *event);
         void mouseMoveEvent(QMouseEvent *event);
         void mouseReleaseEvent(QMouseEvent *event);
+        void keyPressEvent(QKeyEvent *event);
         void wheelEvent(QWheelEvent *event);
+        //void resizeEvent(QResizeEvent* size);
 
+        bool mFullScreen;
 
 
 

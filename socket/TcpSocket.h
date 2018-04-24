@@ -9,7 +9,7 @@ namespace MapTcp {
     {
         Q_OBJECT
     public:
-        TcpSocket(QString ip,QString port,QObject *parent = 0);
+        TcpSocket(QObject *parent = 0);
         bool closeSocket();
         bool connectSocket(QThread *thread);
         int SendSockPackage(char *buf, int ack_len, char *ack);

@@ -10,6 +10,7 @@
 #include "socket/TcpTaskActionNode.h"
 #include "socket/TcpTaskGoal.h"
 #include "socket/TcpTaskLidar.h"
+#include "socket/TcpTaskLoadMap.h"
 
 using namespace MapTcp;
 namespace MapTcp {
@@ -25,9 +26,13 @@ namespace MapTcp {
         void OnActivateNode(QString str,bool enable);
         void OnCmdVel(float x,float y,float z);
         void OnDownloadLidarData();
+        void OnLoadMap();
 
         void setIpPort(QString ip, QString port);
 
+
+        static QString sysIP;
+        static QString sysPort;
     signals:
 
     public slots:
@@ -38,6 +43,7 @@ namespace MapTcp {
         MapTcp::TcpTaskGoal ThreadGoal;
         MapTcp::TcpTaskLidar ThreadLidar;
         MapTcp::TcpTaskCmdVel ThreadCmdVel;
+        MapTcp::TcpTaskLoadMap ThreadLoadMap;
     };
 }
 #endif // SOCKETTHREAD_H
