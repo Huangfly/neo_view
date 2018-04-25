@@ -100,6 +100,7 @@ void map_main::OnRobotTimer()
 void map_main::OnResetPose()
 {
     //ui->_map_view->resetPose();
+    m_MapViewCtl.resetView();
 }
 
 void map_main::OnLockRot()

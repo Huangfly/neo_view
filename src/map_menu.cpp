@@ -38,8 +38,8 @@ void map_menu::OnNav_NavigationMode()
     if(ui->Nav_NavigationMode->isChecked()){
         if(!ui->Nav_ExploreMode->isChecked()
             && !ui->Nav_MappingMode->isChecked()){
-            m_map_main_ctl->actionRobot();
             m_map_main_ctl->OnActivateNode("navigation",1);
+            m_map_main_ctl->actionRobot();
         }else{
             ui->Nav_NavigationMode->setChecked(false);
         }
@@ -64,13 +64,7 @@ void map_menu::OnNav_ExploreMode()
 
 void map_menu::OnNav_Location()
 {
-    if(ui->Nav_Location->isChecked()
-        && ui->Nav_NavigationMode->isChecked()){
-        m_map_main_ctl->OnActivateNode("location",1);
-    }else{
-        ui->Nav_Location->setChecked(false);
-        m_map_main_ctl->OnActivateNode("location",0);
-    }
+    m_map_main_ctl->OnActivateNode("location",1);
 }
 
 

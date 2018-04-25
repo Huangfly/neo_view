@@ -41,6 +41,9 @@ class Camera
 {
 public:
     Camera( void );
+
+    void reset();
+
     void SetPos( const QVector3D pos, bool _try = false );
     void SetWindows( int w,int h ) { this->m_Win_Width = w; this->m_Win_Height = h; }
     inline QVector3D& Pos( void ) { return m_Pos; }

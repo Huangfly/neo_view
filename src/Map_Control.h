@@ -32,6 +32,7 @@ namespace MapWin {
         void mousePress(QMouseEvent *event);
         void mouseMove(QMouseEvent *event);
         void mouseRelease(QMouseEvent *event);
+        void resetView();
 
         //
         void updateMap(char *data,int w,int h, float resolution,ST_POSE pose);

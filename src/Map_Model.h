@@ -201,6 +201,7 @@ namespace MapWin {
 
         //OpenGL camera
         Camera& GetCamera(){ return m_Camera; }
+        void resetCamera(){ m_Camera.reset();m_Camera.SetPos(QVector3D(0.0f,0.0f,10.0f)); }
 
         //Goal
         void addGoal(MapWin::POSE goalPose);
@@ -225,6 +226,7 @@ namespace MapWin {
         }
         //
         void updateLidarData(std::vector<float> vec, float angle_min,float angle_max,float angle_increment,ST_POSE pose);
+        void clearLidar();
 
     protected:
     private:

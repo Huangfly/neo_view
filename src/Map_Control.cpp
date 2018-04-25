@@ -136,6 +136,12 @@ void Map_Control::mouseRelease(QMouseEvent *event)
 
 }
 
+void Map_Control::resetView()
+{
+    model_->resetCamera();
+    view_->emitUpdateUI();
+}
+
 void Map_Control::updateMap(char *data, int w, int h, float resolution, ST_POSE pose)
 {
     model_->updateMap(data,w,h,resolution,pose);
@@ -151,6 +157,8 @@ void Map_Control::updateMap(std::vector<char> data, int w, int h, float resoluti
 void Map_Control::clearMap()
 {
     model_->clearMap();
+    model_->clearLidar();
+    model_->clearGoals();
     view_->emitUpdateUI();
 }
 

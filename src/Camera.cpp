@@ -53,6 +53,20 @@ Camera::Camera( void )
     m_HorizontalAngle = 0.0f;
     m_Try = false;
 }
+
+void Camera::reset()
+{
+    m_Pos = QVector3D( 0, 0, 0 );
+    m_RotateX = 0.0f;
+    m_RotateY = 0.0;
+    m_RotateH = 0.0;
+    m_Len = QVector3D( 0, 0, 0 );
+    m_TryPos = QVector3D( 0, 0, 0 );
+    m_TryRotateY = 0.0;
+    m_TryRotateH = 0.0;
+    m_HorizontalAngle = 0.0f;
+    m_Try = false;
+}
 /*---------------------------------------------------------------------------*/
 void Camera::SetPos( const QVector3D pos, bool _try )
 {

@@ -643,7 +643,14 @@ void Map_Model::updateLidarData(std::vector<float> vec, float angle_min,float an
     LidarDatas.angle_max = angle_max;
     LidarDatas.angle_min = angle_min;
     LidarDatas.pushVector(vec);
-    LidarDatas.pose.FromPOSE(pose);\
+    LidarDatas.pose.FromPOSE(pose);
+    pthread_mutex_unlock(mutex_update_ptr);
+}
+
+void Map_Model::clearLidar()
+{
+    pthread_mutex_lock(mutex_update_ptr);
+    LidarDatas.clear();
     pthread_mutex_unlock(mutex_update_ptr);
 }
 
