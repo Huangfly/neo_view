@@ -147,22 +147,34 @@ void map_menu::OnAction_BtnRelease()
 void map_menu::OnAction_Left()
 {
     printf("OnAction_Left\n");
-    m_map_main_ctl->m_socketMag->OnCmdVel(0.0,0.0,0.8);
+    m_map_main_ctl->m_socketMag->OnCmdVel(0.0,0.0,m_Angular);
 }
 
 void map_menu::OnAction_Right()
 {
-    m_map_main_ctl->m_socketMag->OnCmdVel(0.0,0.0,-0.8);
+    m_map_main_ctl->m_socketMag->OnCmdVel(0.0,0.0,-m_Angular);
 }
 
 void map_menu::OnAction_Forward()
 {
-    m_map_main_ctl->m_socketMag->OnCmdVel(0.25,0.0,0.0);
+    m_map_main_ctl->m_socketMag->OnCmdVel(m_Velocity,0.0,0.0);
 }
 
 void map_menu::OnAction_Back()
 {
-    m_map_main_ctl->m_socketMag->OnCmdVel(-0.25,0.0,0.0);
+    m_map_main_ctl->m_socketMag->OnCmdVel(-m_Velocity,0.0,0.0);
+}
+
+void map_menu::OnAction_Velocity(int val)
+{
+    this->ui->Actionlabel_Velocity->setText(QString("%1").arg(float(val/100.0f)));
+    m_Velocity = float(val/100.0f);
+}
+
+void map_menu::OnAction_Angular(int val)
+{
+    this->ui->Actionlabel_Angular->setText(QString("%1").arg(float(val/100.0f)));
+    m_Angular = float(val/100.0f);
 }
 
 map_menu::map_menu(QWidget *parent) :
@@ -189,6 +201,9 @@ map_menu::map_menu(QWidget *parent) :
     connect(ui->action_right,SIGNAL(released()),this,SLOT(OnAction_BtnRelease()));
     connect(ui->action_forward,SIGNAL(released()),this,SLOT(OnAction_BtnRelease()));
     connect(ui->action_back,SIGNAL(released()),this,SLOT(OnAction_BtnRelease()));
+
+    connect(ui->Action_VelocitySlider,SIGNAL(valueChanged(int)),this,SLOT(OnAction_Velocity(int)));
+    connect(ui->Action_AngularSlider,SIGNAL(valueChanged(int)),this,SLOT(OnAction_Angular(int)));
 
     connect(ui->Nav_MappingMode,SIGNAL(clicked()),this,SLOT(OnNav_Mapping()));
     connect(ui->Nav_NavigationMode,SIGNAL(clicked()),this,SLOT(OnNav_NavigationMode()));

@@ -26,7 +26,7 @@ bool map_main::isPatrol()
 void map_main::actionRobot()
 {
     this->isActionRobot = true;
-    this->m_robot_timer->start(200);
+    this->m_robot_timer->start(100);
 }
 
 void map_main::lockRobot()

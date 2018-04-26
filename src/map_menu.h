@@ -33,6 +33,9 @@ public slots:
     void OnAction_Forward();
     void OnAction_Back();
 
+    void OnAction_Velocity(int val);
+    void OnAction_Angular(int val);
+
 public:
     explicit map_menu(QWidget *parent = 0);
     ~map_menu();
@@ -45,6 +48,9 @@ private:
     Map_View *m_map_view_ctl;
     CMDVEL_PACKAGE_POP cmdvel_body;
     QTimer *m_cmdvel_timer;
+
+    float m_Velocity;
+    float m_Angular;
 };
 
 
