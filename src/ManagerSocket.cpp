@@ -54,6 +54,11 @@ void ManagerSocket::OnLoadMap()
     this->ThreadLoadMap.startThread();
 }
 
+void ManagerSocket::OnGlobalPath()
+{
+    this->ThreadGlobalPath.startThread();
+}
+
 void ManagerSocket::setIpPort(QString ip, QString port)
 {
     this->sysIP = ip;
@@ -65,6 +70,7 @@ void ManagerSocket::setIpPort(QString ip, QString port)
     this->ThreadLidar.p_socket->setIpPort(ip,port);
     this->ThreadRobotStatus.p_socket->setIpPort(ip,port);
     this->ThreadLoadMap.p_socket->setIpPort(ip,port);
+    this->ThreadGlobalPath.p_socket->setIpPort(ip,port);
 }
 
 

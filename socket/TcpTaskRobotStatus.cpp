@@ -37,6 +37,7 @@ void TcpTaskRobotStatus::run()
         P_HEAD *ackhead = (P_HEAD*)(ack_buf+1);
         STATUS_PACKAGE_ACK *ack_package = (STATUS_PACKAGE_ACK*)(ack_buf+1+sizeof(P_HEAD));
         head->funcId = PACK_HEARD;
+        head->msg_code = 0;
         head->size = sizeof(P_HEAD)+sizeof(STATUS_PACKAGE_POP);
         pop_package->isAck = 1;
         pop_buf[0] = 0xAA;

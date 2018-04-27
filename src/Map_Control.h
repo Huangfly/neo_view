@@ -49,6 +49,8 @@ namespace MapWin {
         //
         void updateLidarData(std::vector<float> vec, float angle_min,float angle_max,float angle_increment, ST_POSE pose);
 
+        void updateGlobalPath(std::vector<QVector2D> vec);
+
         Map_View *view_;
         Map_Model *model_;
     };

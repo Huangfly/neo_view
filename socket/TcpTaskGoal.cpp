@@ -43,6 +43,7 @@ void TcpTaskGoal::run()
         //P_HEAD *ackhead = (P_HEAD*)(ack+1);
         //GOAL_PACKAGE_ACK *ack_package = (GOAL_PACKAGE_ACK*)(ack_buf+1+sizeof(P_HEAD));
         head->funcId = PACK_GOAL;
+        head->msg_code = 0;
         head->size = sizeof(P_HEAD)+sizeof(GOAL_PACKAGE_POP);
 
         pop_buf[0] = 0xAA;

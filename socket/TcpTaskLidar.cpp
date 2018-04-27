@@ -35,6 +35,7 @@ void TcpTaskLidar::run()
     P_HEAD *ackhead = (P_HEAD*)(ack+1);
     LIDAR_PACKAGE_ACK *lidar_ack = (LIDAR_PACKAGE_ACK*)(ack+1+sizeof(P_HEAD));
     head->funcId = PACK_LIDAR;
+    head->msg_code = 0;
     head->size = sizeof(P_HEAD)+sizeof(LIDAR_PACKAGE_POP);
     //map_pop->package_num = 0;
     //map_pop->package_sum = 0;

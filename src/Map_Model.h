@@ -167,6 +167,30 @@ namespace MapWin {
         std::vector<char> data;
     };
 
+    class PathVector{
+    public:
+        PathVector(){
+
+        }
+
+        void clear(){ data.clear(); }
+
+        void pushVector(std::vector<QVector2D> vec){
+
+            for(unsigned int i = 0; i< vec.size(); i++){
+                this->data.push_back(vec[i]);
+            }
+        }
+
+        void pushVector(std::vector<QVector2D> vec, int size){
+
+            for(int i = 0; i< size; i++){
+                this->data.push_back(vec[i]);
+            }
+        }
+        std::vector<QVector2D> data;
+    };
+
     void globalpose_to_mappose(
             float &x,
             float &y,
@@ -224,9 +248,13 @@ namespace MapWin {
         void getRobotPose(MapWin::POSE &pose){
             pose = robotPose_;
         }
-        //
+        //Lidar
         void updateLidarData(std::vector<float> vec, float angle_min,float angle_max,float angle_increment,ST_POSE pose);
         void clearLidar();
+
+        //Paths
+        void updateGlobalPath(std::vector<QVector2D> vec);
+        void clearGlobalPath();
 
     protected:
     private:
@@ -252,6 +280,9 @@ namespace MapWin {
 
         //robot pose
         MapWin::POSE robotPose_;
+
+        //globalpath
+        MapWin::PathVector GlobalPaths;
 
         //Goals
         std::list<MapWin::POSE> Goals;

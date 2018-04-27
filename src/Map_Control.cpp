@@ -204,3 +204,9 @@ void Map_Control::updateLidarData(std::vector<float> vec, float angle_min,float 
     view_->emitUpdateUI();
 }
 
+void Map_Control::updateGlobalPath(std::vector<QVector2D> vec)
+{
+    model_->updateGlobalPath(vec);
+    view_->emitUpdateUI();
+}
+

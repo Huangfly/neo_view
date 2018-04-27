@@ -226,7 +226,7 @@ static void setPose(float x, float y,float z, float size, float red, float green
 // |
 // |
 */
-static void setGoal(float x, float y,float z, float size, float red, float green, float blue, float q[4])
+static void setGoal(float x, float y,float z, float size, float red, float green, float blue, float q[])
 {
 
    float R;  //半径
@@ -248,7 +248,7 @@ static void setGoal(float x, float y,float z, float size, float red, float green
    glColor3f(red, green, blue);
    for(int i = 0; i<n; i++)
    {
-       glVertex3f(R*cos(2*PI/n*i)+x, R*sin(2*PI/n*i)+y, z);
+       glVertex2f(R*cos(2*PI/n*i)+x, R*sin(2*PI/n*i)+y);//, z);
    }
    glEnd();
 }
@@ -365,6 +365,16 @@ void Map_Model::drawGL()
         //glFlush();
     }
 
+    //------GlobalPath-----
+    if(GlobalPaths.data.size()>0){
+        std::vector<QVector2D>::iterator it = GlobalPaths.data.begin();
+        for(; it != GlobalPaths.data.end(); it++)
+        {
+            setGoal(it->x(),it->y(), 0.0f + 0.000002,   0.03,   0.0,1.0,0.0,  NULL);
+
+        }
+    }
+
     //------Pose------
     //if(MapDatas.data.size() > 0)
     {
@@ -384,14 +394,14 @@ void Map_Model::drawGL()
     if(Goals.size()>0){
         std::list<MapWin::POSE>::iterator it = Goals.begin();
         if(1){//robotPose.movebase_status == 1){
-            setGoal(it->x,it->y, 0.0f + 0.000002,   0.1,   1.0,0.0,0.0,  NULL);
+            setGoal(it->x,it->y, 0.0f + 0.000002,   0.2,   1.0,0.0,0.0,  NULL);
         }else{
-            setGoal(it->x,it->y, 0.0f + 0.000002,   0.1,   1.0,0.0,0.0,  NULL);
+            setGoal(it->x,it->y, 0.0f + 0.000002,   0.2,   1.0,0.0,0.0,  NULL);
         }
         it++;
         for(; it!=Goals.end(); it++)
         {
-            setGoal(it->x,it->y, 0.0f + 0.000002,   0.1,   1.0,0.0,0.0,  NULL);
+            setGoal(it->x,it->y, 0.0f + 0.000002,   0.2,   1.0,0.0,0.0,  NULL);
 
         }
     }
@@ -406,26 +416,12 @@ void Map_Model::drawGL()
         glColor4f(1.0f, 0.0f, 0.0f,0.3f);
         float lidar_x,lidar_y;
         float lidar_x_old,lidar_y_old;
-        int start_pos = 0;
-
-        for(start_pos = 0; start_pos<LidarDatas.data.size();start_pos++){
-
-            if( std::isinf(LidarDatas.data[start_pos])) continue;
-
-
-            MapWin::LidarDataToMapCoordinate(
-                        lidar_x_old,lidar_y_old,
-                        this->LidarDatas.pose,
-                        LidarDatas.data[start_pos],
-                        start_pos*LidarDatas.angle_increment);
-            break;
-        }
-
-        for(unsigned int i = start_pos; i<LidarDatas.data.size();i++){
-
-            if( std::isinf(LidarDatas.data[i])) continue;
-
-
+        MapWin::LidarDataToMapCoordinate(
+                    lidar_x_old,lidar_y_old,
+                    this->LidarDatas.pose,
+                    LidarDatas.data[0],
+                    0.0f);
+        for(unsigned int i = 1; i<LidarDatas.data.size();i++){
             MapWin::LidarDataToMapCoordinate(
                         lidar_x,lidar_y,
                         this->LidarDatas.pose,
@@ -447,26 +443,9 @@ void Map_Model::drawGL()
             lidar_y_old = lidar_y;
 
         }
-
-        MapWin::LidarDataToMapCoordinate(
-                    lidar_x,lidar_y,
-                    this->LidarDatas.pose,
-                    LidarDatas.data[start_pos],
-                    start_pos*LidarDatas.angle_increment);
-
-        glBegin(GL_POLYGON);
-        glColor4f(1.0f, 0.0f, 0.0f,0.1f);
-        glVertex2f(lidar_x_old, lidar_y_old);
-        glVertex2f(lidar_x, lidar_y);
-        glVertex2f(this->LidarDatas.pose.x, this->LidarDatas.pose.y);
-        glEnd();
-        setPoint(lidar_x ,
-                 lidar_y,
-                 0.001,
-                 MapDatas.resolution*2,
-                 1.0f,0.0f,0.0f);
         //glEnd();
     }
+
 
     //------Grid------
     glBegin(GL_LINES);
@@ -683,6 +662,21 @@ void Map_Model::clearLidar()
 {
     pthread_mutex_lock(mutex_update_ptr);
     LidarDatas.clear();
+    pthread_mutex_unlock(mutex_update_ptr);
+}
+
+void Map_Model::updateGlobalPath(std::vector<QVector2D> vec)
+{
+    pthread_mutex_lock(mutex_update_ptr);
+    GlobalPaths.clear();
+    GlobalPaths.pushVector(vec);
+    pthread_mutex_unlock(mutex_update_ptr);
+}
+
+void Map_Model::clearGlobalPath()
+{
+    pthread_mutex_lock(mutex_update_ptr);
+    GlobalPaths.clear();
     pthread_mutex_unlock(mutex_update_ptr);
 }
 

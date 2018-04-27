@@ -94,6 +94,11 @@ void map_main::OnRobotTimer()
         m_socketMag->OnDownloadMap();
     }
 
+    if(timerCount%5 == 0)
+    {
+        m_socketMag->OnGlobalPath();
+    }
+
     m_socketMag->OnRobotStatus();
 }
 

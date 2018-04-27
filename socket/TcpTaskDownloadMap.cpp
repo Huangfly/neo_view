@@ -38,6 +38,7 @@ void TcpTaskDownloadMap::run()
     P_HEAD *ackhead = (P_HEAD*)(ack+1);
     MAP_PACKAGE_ACK *map_ack = (MAP_PACKAGE_ACK*)(ack+1+16);
     head->funcId = PACK_MAP;
+    head->msg_code = 0;
     head->size = 16+8;
     map_pop->package_num = 0;
     map_pop->package_sum = 0;
@@ -86,7 +87,7 @@ void TcpTaskDownloadMap::run()
         }
     }while(map_pop->package_sum != 0 && map_pop->package_sum >= map_ack->package_num);
 
-    printf("map ack w:%d h:%d size:%d recv:%d\n",map_ack->width,map_ack->hight,map_ack->size,(int)(DataPos-map_Data));
+    //printf("map ack w:%d h:%d size:%d recv:%d\n",map_ack->width,map_ack->hight,map_ack->size,(int)(DataPos-map_Data));
     //printf("ack x:%f y:%f \n",map_ack->x,map_ack->y);
 
     this->p_socket->closeSocket();

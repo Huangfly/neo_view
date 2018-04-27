@@ -28,6 +28,7 @@ void MapTcp::TcpTaskCmdVel::run()
     P_HEAD *head = (P_HEAD*)(pop_buf+1);
     CMDVEL_PACKAGE_POP *pop_package = (CMDVEL_PACKAGE_POP*)(pop_buf+1+sizeof(P_HEAD));
     head->funcId = PACK_CMDVEL;
+    head->msg_code = 0;
     head->size = sizeof(P_HEAD)+sizeof(CMDVEL_PACKAGE_POP);
     memcpy(pop_package,&pop_body,sizeof(CMDVEL_PACKAGE_POP));
 

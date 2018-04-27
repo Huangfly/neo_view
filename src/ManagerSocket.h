@@ -11,6 +11,7 @@
 #include "socket/TcpTaskGoal.h"
 #include "socket/TcpTaskLidar.h"
 #include "socket/TcpTaskLoadMap.h"
+#include "socket/TcpTaskGlobalPath.h"
 
 using namespace MapTcp;
 namespace MapTcp {
@@ -27,6 +28,7 @@ namespace MapTcp {
         void OnCmdVel(float x,float y,float z);
         void OnDownloadLidarData();
         void OnLoadMap();
+        void OnGlobalPath();
 
         void setIpPort(QString ip, QString port);
 
@@ -44,6 +46,7 @@ namespace MapTcp {
         MapTcp::TcpTaskLidar ThreadLidar;
         MapTcp::TcpTaskCmdVel ThreadCmdVel;
         MapTcp::TcpTaskLoadMap ThreadLoadMap;
+        MapTcp::TcpTaskGlobalPath ThreadGlobalPath;
     };
 }
 #endif // SOCKETTHREAD_H

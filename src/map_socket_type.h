@@ -10,8 +10,10 @@
 #define PACK_CMDVEL     8 //
 #define PACK_LIDAR      9 //
 #define PACK_LOADMAP    10//
+#define PACK_GLOBALPATH 11//
 
 #define LOADMAP_PACKAGE_SIZE    512
+#define PATH_MAX_SIZE 50
 
 typedef struct {
     float x;
@@ -20,6 +22,10 @@ typedef struct {
     float Quaternion[4];//xyzw
 }ST_POSE;
 
+typedef struct {
+    float x;
+    float y;
+}ST_POINT;
 
 typedef struct packet_head
 {
@@ -138,6 +144,17 @@ typedef struct {
     unsigned int package_num;// map package num.
 } LOADMAP_PACKAGE_ACK;
 
+
+
+typedef struct {
+    unsigned int serial_num;
+} GLOBALPATH_PACKAGE_POP;
+
+typedef struct {
+    unsigned int serial_num;
+    unsigned int path_size;
+    ST_POINT path[PATH_MAX_SIZE];
+} GLOBALPATH_PACKAGE_ACK;
 
 #endif // MAP_SOCKET_TYPE
 
