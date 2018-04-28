@@ -416,12 +416,20 @@ void Map_Model::drawGL()
         glColor4f(1.0f, 0.0f, 0.0f,0.3f);
         float lidar_x,lidar_y;
         float lidar_x_old,lidar_y_old;
-        MapWin::LidarDataToMapCoordinate(
-                    lidar_x_old,lidar_y_old,
-                    this->LidarDatas.pose,
-                    LidarDatas.data[0],
-                    0.0f);
-        for(unsigned int i = 1; i<LidarDatas.data.size();i++){
+        float lidar_x_start,lidar_y_start;
+        unsigned int i = 0;
+        for(; i<LidarDatas.data.size();i++){
+            if(std::isinf(LidarDatas.data[i]))continue;
+            MapWin::LidarDataToMapCoordinate(
+                        lidar_x_old,lidar_y_old,
+                        this->LidarDatas.pose,
+                        LidarDatas.data[i],
+                        i*LidarDatas.angle_increment);
+            lidar_x_start = lidar_x_old;
+            lidar_y_start = lidar_y_old;
+        }
+        for(; i<LidarDatas.data.size();i++){
+            if(std::isinf(LidarDatas.data[i]))continue;
             MapWin::LidarDataToMapCoordinate(
                         lidar_x,lidar_y,
                         this->LidarDatas.pose,
@@ -443,6 +451,12 @@ void Map_Model::drawGL()
             lidar_y_old = lidar_y;
 
         }
+        glBegin(GL_POLYGON);
+        glColor4f(1.0f, 0.0f, 0.0f,0.1f);
+        glVertex2f(lidar_x_old, lidar_y_old);
+        glVertex2f(lidar_x_start, lidar_y_start);
+        glVertex2f(this->LidarDatas.pose.x, this->LidarDatas.pose.y);
+        glEnd();
         //glEnd();
     }
 
