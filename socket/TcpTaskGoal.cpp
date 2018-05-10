@@ -30,45 +30,29 @@ void TcpTaskGoal::startCancelGoalThread(){
 
 void TcpTaskGoal::run()
 {
-    char pop_buf[80];
-    char ack_buf[80];
 
-    if( !this->p_socket->connectSocket(this) ){
+    if( !this->p_socket->connectSocket() ){
         return;
     }
     if(this->isSendGoal){
         map_main *ctl = Win::GetMainWin();
-        P_HEAD *head = (P_HEAD*)(pop_buf+1);
-        GOAL_PACKAGE_POP *pop_package = (GOAL_PACKAGE_POP*)(pop_buf+1+sizeof(P_HEAD));
-        //P_HEAD *ackhead = (P_HEAD*)(ack+1);
-        //GOAL_PACKAGE_ACK *ack_package = (GOAL_PACKAGE_ACK*)(ack_buf+1+sizeof(P_HEAD));
-        head->funcId = PACK_GOAL;
-        head->msg_code = 0;
-        head->size = sizeof(P_HEAD)+sizeof(GOAL_PACKAGE_POP);
-
-        pop_buf[0] = 0xAA;
-        pop_buf[1+sizeof(P_HEAD)+sizeof(GOAL_PACKAGE_POP)+1]=0xAB;
-        if(ctl->m_MapViewCtl.GetGoal(pop_package))
+        this->InitPacket(Neo_Packet::PacketType::SENDGOAL, sizeof(Neo_Packet::GOAL_PACKAGE_POP), sizeof(Neo_Packet::GOAL_PACKAGE_ACK));
+        if(ctl->m_MapViewCtl.GetGoal((Neo_Packet::GOAL_PACKAGE_POP*)this->PacketSend_Body))
         {
-            if(this->p_socket->SendSockPackage(pop_buf,sizeof(GOAL_PACKAGE_ACK),ack_buf) == head->funcId)
+            if(this->p_socket->SendSockPackage(this->packet_send,sizeof(Neo_Packet::GOAL_PACKAGE_ACK),this->packet_recv) == this->PacketSend_Head->function_id)
             {
                 printf("Goal send success...\n");
             }
         }
     }else{
-        P_HEAD *head = (P_HEAD*)(pop_buf+1);
-        CANCELGOAL_PACKAGE_POP *pop_package = (CANCELGOAL_PACKAGE_POP*)(pop_buf+1+sizeof(P_HEAD));
-        head->funcId = PACK_CANCELGOAL;
-        head->size = sizeof(P_HEAD)+sizeof(CANCELGOAL_PACKAGE_POP);
-        pop_package->isAck = 1;
 
-        pop_buf[0] = 0xAA;
-        pop_buf[1+sizeof(P_HEAD)+sizeof(CANCELGOAL_PACKAGE_POP)+1]=0xAB;
-        if(this->p_socket->SendSockPackage(pop_buf,sizeof(CANCELGOAL_PACKAGE_ACK),ack_buf) == head->funcId)
+        this->InitPacket(Neo_Packet::PacketType::CANCELGOAL, sizeof(Neo_Packet::CANCELGOAL_PACKAGE_POP), sizeof(Neo_Packet::CANCELGOAL_PACKAGE_ACK));
+
+        if(this->p_socket->SendSockPackage(this->packet_send,sizeof(Neo_Packet::CANCELGOAL_PACKAGE_ACK),this->packet_recv) == this->PacketSend_Head->function_id)
         {
             printf("Goal cancel success...\n");
         }
     }
-
+    this->ReleasePacket();
     this->p_socket->closeSocket();
 }

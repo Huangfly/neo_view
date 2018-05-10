@@ -13,7 +13,8 @@ namespace MapTcp {
     public:
         explicit TcpTaskBase(QObject *parent = 0);
         virtual ~TcpTaskBase();
-        void InitPacket(unsigned char mode, unsigned int sendBodySize, unsigned int recvBodySize,unsigned int drive_id = 0);
+        void InitPacket(unsigned char mode, unsigned int sendBodySize, unsigned int recvBodySize,unsigned int device_id = 0);
+        void ReleasePacket();
         TcpSocket *p_socket;
         int tcpDes;
         QString sysIP;
@@ -23,9 +24,9 @@ namespace MapTcp {
         unsigned int PacketRecvSize;
         char *packet_send;
         char *packet_recv;
-        P_HEAD *PacketSend_Head;
+        Neo_Packet::HEAD *PacketSend_Head;
         void *PacketSend_Body;
-        P_HEAD *PacketRecv_Head;
+        Neo_Packet::HEAD *PacketRecv_Head;
         void *PacketRecv_Body;
     };
 }

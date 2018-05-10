@@ -11,8 +11,8 @@ namespace MapTcp {
     public:
         TcpSocket(QObject *parent = 0);
         bool closeSocket();
-        bool connectSocket(QThread *thread);
-        int SendSockPackage(char *buf, int ack_len, char *ack);
+        bool connectSocket();
+        int SendSockPackage(char *buf, int ack_len, char *ack, unsigned int time_out = 5000);
         void setIpPort(QString ip,QString port){ sysIP = ip; sysPort = port; }
     public slots:
         void OnSocketConnected();

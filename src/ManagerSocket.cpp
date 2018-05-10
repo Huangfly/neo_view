@@ -5,7 +5,7 @@
 using namespace MapTcp;
 
 QTcpSocket *pt_socket = NULL;
-QString ManagerSocket::sysIP = "192.168.1.125";
+QString ManagerSocket::sysIP = "192.168.1.126";
 QString ManagerSocket::sysPort = "8888";
 
 ManagerSocket::ManagerSocket()

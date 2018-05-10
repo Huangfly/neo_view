@@ -160,7 +160,7 @@ map_main::map_main(QWidget *parent) :
     connect(m_robot_timer,SIGNAL(timeout()), this, SLOT(OnRobotTimer()));
 
 
-    memset(&m_robot_status,0,sizeof(STATUS_PACKAGE_ACK));
+    memset(&m_robot_status,0,sizeof(Neo_Packet::STATUS_PACKAGE_ACK));
 
     this->m_socketMag = new MapTcp::ManagerSocket();
 

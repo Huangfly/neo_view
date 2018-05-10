@@ -43,7 +43,7 @@ public:
 
     QTimer *m_robot_timer;
     unsigned int timerCount;
-    STATUS_PACKAGE_ACK m_robot_status;
+    Neo_Packet::STATUS_PACKAGE_ACK m_robot_status;
     ManagerSocket *m_socketMag;
 
     MapWin::Map_Control m_MapViewCtl;

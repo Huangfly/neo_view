@@ -173,7 +173,7 @@ void Map_Control::SaveMap(QString file_name)
     model_->SaveMap(file_name);
 }
 
-void Map_Control::updateRobotPose(STATUS_PACKAGE_ACK pose)
+void Map_Control::updateRobotPose(Neo_Packet::STATUS_PACKAGE_ACK pose)
 {
     model_->updateRobot(pose);
     view_->emitUpdateUI();
@@ -187,7 +187,7 @@ bool Map_Control::GetGoal( POSE &goal )
     return true;
 }
 
-bool Map_Control::GetGoal(GOAL_PACKAGE_POP *goal)
+bool Map_Control::GetGoal(Neo_Packet::GOAL_PACKAGE_POP *goal)
 {
     if(model_->countGoals() < 1) return false;
     MapWin::POSE mgoal;

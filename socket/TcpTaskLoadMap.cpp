@@ -17,18 +17,17 @@ MapTcp::TcpTaskLoadMap::~TcpTaskLoadMap()
 
 void MapTcp::TcpTaskLoadMap::run()
 {
-    //char *DataPos = map_Data;
     map_main *map_main_ptr = Win::GetMainWin();
 
-    printf("LoadMap Tcp\n");
-    if(!this->p_socket->connectSocket(this)) {
+
+    if(!this->p_socket->connectSocket()) {
         return;
     }
 
-    this->InitPacket(PACK_LOADMAP,sizeof(LOADMAP_PACKAGE_POP),sizeof(LOADMAP_PACKAGE_ACK));
+    this->InitPacket(Neo_Packet::PacketType::MAPUPLOAD,sizeof(Neo_Packet::LOADMAP_PACKAGE_POP),sizeof(Neo_Packet::LOADMAP_PACKAGE_ACK));
 
-    LOADMAP_PACKAGE_POP *send_body = (LOADMAP_PACKAGE_POP *)this->PacketSend_Body;
-    LOADMAP_PACKAGE_ACK *recv_body = (LOADMAP_PACKAGE_ACK *)this->PacketRecv_Body;
+    Neo_Packet::LOADMAP_PACKAGE_POP *send_body = (Neo_Packet::LOADMAP_PACKAGE_POP *)this->PacketSend_Body;
+    Neo_Packet::LOADMAP_PACKAGE_ACK *recv_body = (Neo_Packet::LOADMAP_PACKAGE_ACK *)this->PacketRecv_Body;
 
     MapWin::MapVector MapData;
     map_main_ptr->m_MapViewModle.GetMap(MapData);
@@ -49,22 +48,8 @@ void MapTcp::TcpTaskLoadMap::run()
                           , (send_body->package_num-1) * LOADMAP_PACKAGE_SIZE
                           , ( (send_body->package_num-1) * LOADMAP_PACKAGE_SIZE + send_body->data_size ));
 
-        p_socket->write(this->packet_send,this->PacketSendSize);
-        if(!p_socket->waitForBytesWritten()){
-            printf("send() error\n");
-            break;
-        }
 
-        int ret = 0;
-        bool result = false;
-        result = p_socket->waitForReadyRead(5000);
-
-        if(!result || ( ret=p_socket->read(this->packet_recv,this->PacketRecvSize) ) == -1) {
-            printf("recv() error\n");
-            break;
-        }
-
-        if( this->PacketRecv_Head->funcId == PACK_LOADMAP )
+        if( this->PacketRecv_Head->function_id == this->p_socket->SendSockPackage(this->packet_send, sizeof(Neo_Packet::LOADMAP_PACKAGE_ACK), this->packet_recv) )
         {
             printf("ack sum:%d num:%d\n",recv_body->package_sum,recv_body->package_num);
             //send_body->package_sum = recv_body->package_sum;

@@ -19,47 +19,21 @@ lidar_Data.clear();
 
 void TcpTaskLidar::run()
 {
-    //char *DataPos = map_Data;
     map_main *ctl = Win::GetMainWin();
 
     this->isThreadRunning = true;
-    if(!this->p_socket->connectSocket(this)) {
+    if(!this->p_socket->connectSocket()) {
         this->isThreadRunning = false;
         return;
     }
 
-    unsigned char str[50] = {0};
-    unsigned char ack[2200] = {0};
-    P_HEAD *head = (P_HEAD*)(str+1);
-    LIDAR_PACKAGE_POP *lidar_pop = (LIDAR_PACKAGE_POP*)(str+1+sizeof(P_HEAD));
-    P_HEAD *ackhead = (P_HEAD*)(ack+1);
-    LIDAR_PACKAGE_ACK *lidar_ack = (LIDAR_PACKAGE_ACK*)(ack+1+sizeof(P_HEAD));
-    head->funcId = PACK_LIDAR;
-    head->msg_code = 0;
-    head->size = sizeof(P_HEAD)+sizeof(LIDAR_PACKAGE_POP);
-    //map_pop->package_num = 0;
-    //map_pop->package_sum = 0;
-    str[0] = 0xAA;
-    str[ 1 + head->size + 1 ]=0xAB;
+    this->InitPacket(Neo_Packet::PacketType::LIDARDATAS, sizeof(Neo_Packet::LIDAR_PACKAGE_POP), sizeof(Neo_Packet::LIDAR_PACKAGE_ACK));
+    Neo_Packet::LIDAR_PACKAGE_POP *lidar_pop = (Neo_Packet::LIDAR_PACKAGE_POP*)this->PacketSend_Body;
+    Neo_Packet::LIDAR_PACKAGE_ACK *lidar_ack = (Neo_Packet::LIDAR_PACKAGE_ACK*)this->PacketRecv_Body;
+    lidar_pop->package_num = lidar_pop->package_sum = 0;
 
     do{
-
-        p_socket->write((char*)str,head->size+9);
-        if(!p_socket->waitForBytesWritten()){
-            printf("lidar send() error\n");
-            break;
-        }
-
-        //printf("wait ack...\n");
-        int ret = 0;
-        bool result = false;
-        result = p_socket->waitForReadyRead(5000);
-
-        if(!result || (ret=p_socket->read((char*)ack,sizeof(LIDAR_PACKAGE_ACK)+19)) == -1) {
-            printf("lidar recv() error\n");
-            break;
-        }
-        if(ackhead->funcId == PACK_LIDAR )
+        if(this->p_socket->SendSockPackage(this->packet_send, sizeof(Neo_Packet::LIDAR_PACKAGE_ACK), this->packet_recv) == this->PacketSend_Head->function_id )
         {
 
             //printf("lidar ack sum:%d num:%d\n",lidar_ack->package_sum,lidar_ack->package_num);
@@ -70,7 +44,7 @@ void TcpTaskLidar::run()
             if(lidar_ack->package_num == 1){
                 lidar_Data.clear();
             }
-            for(unsigned int i = 0;i<lidar_ack->this_rangs_size;i++){
+            for(unsigned int i = 0;i<lidar_ack->rangs_size;i++){
                 lidar_Data.push_back(lidar_ack->rangs[i]);
             }
 
@@ -90,7 +64,7 @@ void TcpTaskLidar::run()
     this->isThreadRunning = false;
 
     if(lidar_ack->package_sum != 0 && lidar_ack->package_sum == lidar_ack->package_num){
-        ctl->m_MapViewCtl.updateLidarData(lidar_Data,lidar_ack->angle_min,lidar_ack->angle_min,lidar_ack->angle_increment,lidar_ack->pose);
+        ctl->m_MapViewCtl.updateLidarData(lidar_Data,lidar_ack->angle_min,lidar_ack->angle_min,lidar_ack->angle_increment,*((ST_POSE*)&lidar_ack->pose));
     }
 
     lidar_Data.clear();

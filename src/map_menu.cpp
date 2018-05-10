@@ -30,6 +30,7 @@ void map_menu::OnNav_Mapping()
     {
         ctl->OnActivateNode("mapping",0);
         ctl->lockRobot();
+        ctl->m_MapViewCtl.clearMap();
     }
 }
 

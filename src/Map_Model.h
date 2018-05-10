@@ -24,7 +24,7 @@ namespace MapWin {
         float y;
         float z;
         float Quaternion[4];//xyzw
-        void ToPOSE(GOAL_PACKAGE_POP *pop){
+        void ToPOSE(Neo_Packet::GOAL_PACKAGE_POP *pop){
 
             pop->x = x;
             pop->y = y;
@@ -48,7 +48,16 @@ namespace MapWin {
             memcpy(pop->Quaternion,Quaternion,sizeof(Quaternion));
         }
 
-        void FromPOSE(STATUS_PACKAGE_ACK pop){
+        void ToPOSE(Neo_Type::POSE *pop){
+
+            pop->x = x;
+            pop->y = y;
+            pop->z = z;
+
+            memcpy(pop->Quaternion,Quaternion,sizeof(Quaternion));
+        }
+
+        void FromPOSE(Neo_Packet::STATUS_PACKAGE_ACK pop){
             x = pop.x;
             y = pop.y;
             z = pop.z;
@@ -244,7 +253,7 @@ namespace MapWin {
         void LoadMap(QString file_name);
 
         //Robot Pose
-        void updateRobot(STATUS_PACKAGE_ACK pose);
+        void updateRobot(Neo_Packet::STATUS_PACKAGE_ACK pose);
         void getRobotPose(MapWin::POSE &pose){
             pose = robotPose_;
         }

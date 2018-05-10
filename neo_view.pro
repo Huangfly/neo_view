@@ -53,7 +53,18 @@ HEADERS  += src/map_main.h \
     src/Camera.h \
     socket/TcpTaskLoadMap.h \
     socket/TcpPacket.h \
-    socket/TcpTaskGlobalPath.h
+    socket/TcpTaskGlobalPath.h \
+    NeoWare_SDK/Type_MutexMap.hpp \
+    NeoWare_SDK/TypePacket_CancelGoal.h \
+    NeoWare_SDK/TypePacket_CmdVel.h \
+    NeoWare_SDK/TypePacket_GlobalPath.h \
+    NeoWare_SDK/TypePacket_LidarDatas.h \
+    NeoWare_SDK/TypePacket_MapDatas.h \
+    NeoWare_SDK/TypePacket_MapUpload.h \
+    NeoWare_SDK/TypePacket_RobotStatus.h \
+    NeoWare_SDK/TypePacket_RosControl.h \
+    NeoWare_SDK/TypePacket_SendGoal.h \
+    NeoWare_SDK/Type_Pose.h
 
 FORMS    += \
     src/map_menu.ui \

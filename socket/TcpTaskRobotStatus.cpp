@@ -22,51 +22,52 @@ void TcpTaskRobotStatus::run()
     map_main *main_ptr = Win::GetMainWin();
 
     this->isThreadRunning = true;
-    if(!this->p_socket->connectSocket(this)) {
+    if(!this->p_socket->connectSocket()) {
         this->isThreadRunning = false;
         return;
     }
 
 
-    do{
 
-        char pop_buf[50] = {0};
-        char ack_buf[600] = {0};
-        P_HEAD *head = (P_HEAD*)(pop_buf+1);
-        STATUS_PACKAGE_POP *pop_package = (STATUS_PACKAGE_POP*)(pop_buf+1+sizeof(P_HEAD));
-        P_HEAD *ackhead = (P_HEAD*)(ack_buf+1);
-        STATUS_PACKAGE_ACK *ack_package = (STATUS_PACKAGE_ACK*)(ack_buf+1+sizeof(P_HEAD));
-        head->funcId = PACK_HEARD;
-        head->msg_code = 0;
-        head->size = sizeof(P_HEAD)+sizeof(STATUS_PACKAGE_POP);
-        pop_package->isAck = 1;
-        pop_buf[0] = 0xAA;
-        pop_buf[1+sizeof(P_HEAD)+sizeof(STATUS_PACKAGE_POP)+1]=0xAB;
+    /*char pop_buf[50] = {0};
+    char ack_buf[600] = {0};
+    Neo_Packet::HEAD *head = (Neo_Packet::HEAD*)(pop_buf+1);
+    STATUS_PACKAGE_POP *pop_package = (STATUS_PACKAGE_POP*)(pop_buf+1+sizeof(Neo_Packet::HEAD));
+    Neo_Packet::HEAD *ackhead = (Neo_Packet::HEAD*)(ack_buf+1);
+    STATUS_PACKAGE_ACK *ack_package = (STATUS_PACKAGE_ACK*)(ack_buf+1+sizeof(Neo_Packet::HEAD));
+    head->function_id = Neo_Packet::PacketType::ROBOTSTATUS;
+    head->device_id = 0;
+    head->size = sizeof(Neo_Packet::HEAD)+sizeof(STATUS_PACKAGE_POP);
+    pop_package->isAck = 1;
+    pop_buf[0] = 0xAA;
+    pop_buf[1+sizeof(Neo_Packet::HEAD)+sizeof(STATUS_PACKAGE_POP)+1]=0xAB;*/
 
-        p_socket->write((char*)pop_buf,head->size+3);
-        if(!p_socket->waitForBytesWritten(2000)){
-            printf("send() error\n");
-            break;
-        }
-        int ret = 0;
-        bool result = false;
-        result = p_socket->waitForReadyRead(2000);
+   /* p_socket->write((char*)pop_buf,head->size+3);
+    if(!p_socket->waitForBytesWritten(2000)){
+        printf("send() error\n");
+        break;
+    }
+    int ret = 0;
+    bool result = false;
+    result = p_socket->waitForReadyRead(2000);
 
-        if(!result || (ret=p_socket->read((char*)ack_buf,(1+sizeof(P_HEAD)+sizeof(STATUS_PACKAGE_ACK)+1+1))) == -1) {
-            printf("recv(%d) error\n",ack_package->updateMap);
-            break;
-        }
-        if(ackhead->funcId == PACK_HEARD && ret>=0)
-        {
-            //printf("recv(%d) success\n",ack_package->updateMap);
-            memcpy(&main_ptr->m_robot_status,ack_package,sizeof(STATUS_PACKAGE_ACK));
-            main_ptr->m_MapViewCtl.updateRobotPose(main_ptr->m_robot_status);
-        }
-        else
-        {
-            //printf("TcpTaskRobotStatus fail.\n");
-        }
-    }while(0);
+    if(!result || (ret=p_socket->read((char*)ack_buf,(1+sizeof(Neo_Packet::HEAD)+sizeof(STATUS_PACKAGE_ACK)+1+1))) == -1) {
+        printf("recv(%d) error\n",ack_package->updateMap);
+        break;
+    }*/
+
+    this->InitPacket(Neo_Packet::PacketType::ROBOTSTATUS, sizeof(Neo_Packet::STATUS_PACKAGE_POP), sizeof(Neo_Packet::STATUS_PACKAGE_ACK));
+
+    if(this->p_socket->SendSockPackage(this->packet_send, sizeof(Neo_Packet::STATUS_PACKAGE_ACK), this->packet_recv) == this->PacketSend_Head->function_id)
+    {
+        //printf("recv(%d) success\n",ack_package->updateMap);
+        memcpy(&main_ptr->m_robot_status,this->PacketRecv_Body,sizeof(Neo_Packet::STATUS_PACKAGE_ACK));
+        main_ptr->m_MapViewCtl.updateRobotPose(main_ptr->m_robot_status);
+    }
+    else
+    {
+        //printf("TcpTaskRobotStatus fail.\n");
+    }
 
     this->p_socket->closeSocket();
     this->isThreadRunning = false;

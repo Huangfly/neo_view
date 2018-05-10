@@ -1,19 +1,42 @@
 #ifndef MAP_SOCKET_TYPE
 #define MAP_SOCKET_TYPE
 
-#define PACK_HEARD		0 //
-#define PACK_LOGIN		1 //
-#define PACK_MAP        2 //
-#define PACK_GOAL		3 //
-#define PACK_CANCELGOAL	4 //
-#define PACK_NODECTL	5 //
-#define PACK_CMDVEL     8 //
-#define PACK_LIDAR      9 //
-#define PACK_LOADMAP    10//
-#define PACK_GLOBALPATH 11//
+#include "NeoWare_SDK/TypePacket_CancelGoal.h"
+#include "NeoWare_SDK/TypePacket_CmdVel.h"
+#include "NeoWare_SDK/TypePacket_GlobalPath.h"
+#include "NeoWare_SDK/TypePacket_LidarDatas.h"
+#include "NeoWare_SDK/TypePacket_MapDatas.h"
+#include "NeoWare_SDK/TypePacket_MapUpload.h"
+#include "NeoWare_SDK/TypePacket_RobotStatus.h"
+#include "NeoWare_SDK/TypePacket_RosControl.h"
+#include "NeoWare_SDK/TypePacket_SendGoal.h"
 
 #define LOADMAP_PACKAGE_SIZE    512
 #define PATH_MAX_SIZE 50
+
+namespace Neo_Packet {
+
+    enum PacketType {
+        ROBOTSTATUS = 0,
+        MAPDATAS,
+        SENDGOAL,
+        CANCELGOAL,
+        ROSCONTROL,
+        LOCALIZATION,
+        CMDVEL,
+        LIDARDATAS,
+        MAPUPLOAD,
+        GLOBALPLAN,
+        FORWARDTHENINTERPOLATE
+    };
+
+    typedef struct {
+        int size;
+        int function_id;
+        int device_id;
+        int ref;
+    } HEAD;
+}
 
 typedef struct {
     float x;
@@ -27,14 +50,8 @@ typedef struct {
     float y;
 }ST_POINT;
 
-typedef struct packet_head
-{
-        int size;// header len + data len + sum len( 1 byte )
-        int funcId;
-        int msg_code;//00 successed   FF fail
-        int trans_id;
-}P_HEAD;
 
+/*
 typedef struct {
     unsigned int package_sum;// map package total sum.
     unsigned int package_num;// map package num.
@@ -155,6 +172,6 @@ typedef struct {
     unsigned int path_size;
     ST_POINT path[PATH_MAX_SIZE];
 } GLOBALPATH_PACKAGE_ACK;
-
+*/
 #endif // MAP_SOCKET_TYPE
 

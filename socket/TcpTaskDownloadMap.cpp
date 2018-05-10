@@ -21,46 +21,23 @@ TcpTaskDownloadMap::~TcpTaskDownloadMap()
 
 void TcpTaskDownloadMap::run()
 {
-
-    char *DataPos = map_Data;
     map_main *map_main_ptr = Win::GetMainWin();
 
     this->isThreadRunning = true;
-    if(!this->p_socket->connectSocket(this)) {
+    if(!this->p_socket->connectSocket()) {
         this->isThreadRunning = false;
         return;
     }
 
-    unsigned char str[50] = {0};
-    unsigned char ack[800] = {0};
-    P_HEAD *head = (P_HEAD*)(str+1);
-    MAP_PACKAGE_POP *map_pop = (MAP_PACKAGE_POP*)(str+1+16);
-    P_HEAD *ackhead = (P_HEAD*)(ack+1);
-    MAP_PACKAGE_ACK *map_ack = (MAP_PACKAGE_ACK*)(ack+1+16);
-    head->funcId = PACK_MAP;
-    head->msg_code = 0;
-    head->size = 16+8;
-    map_pop->package_num = 0;
-    map_pop->package_sum = 0;
-    str[0] = 0xAA;
-    str[1+16+8+1]=0xAB;
+    this->InitPacket(Neo_Packet::PacketType::MAPDATAS, sizeof(Neo_Packet::MAP_PACKAGE_POP), sizeof(Neo_Packet::MAP_PACKAGE_ACK));
+    Neo_Packet::MAP_PACKAGE_POP *map_pop = (Neo_Packet::MAP_PACKAGE_POP*)this->PacketSend_Body;
+    Neo_Packet::MAP_PACKAGE_ACK *map_ack = (Neo_Packet::MAP_PACKAGE_ACK*)this->PacketRecv_Body;
+
+    map_pop->package_num = map_pop->package_sum = 0;
 
     do{
-        p_socket->write((char*)str,head->size+9);
-        if(!p_socket->waitForBytesWritten()){
-            printf("send() error\n");
-            break;
-        }
 
-        int ret = 0;
-        bool result = false;
-        result = p_socket->waitForReadyRead(5000);
-
-        if(!result || (ret=p_socket->read((char*)ack,sizeof(MAP_PACKAGE_ACK)+19)) == -1) {
-            printf("recv() error\n");
-            break;
-        }
-        if(ackhead->funcId == PACK_MAP )
+        if(this->p_socket->SendSockPackage(this->packet_send, sizeof(Neo_Packet::MAP_PACKAGE_ACK), this->packet_recv) == Neo_Packet::PacketType::MAPDATAS )
         {
 
             //printf("ack sum:%d num:%d\n",map_ack->package_sum,map_ack->package_num);
@@ -74,7 +51,6 @@ void TcpTaskDownloadMap::run()
                 MapDatas.push_back(map_ack->data[i]);
             }
 
-            DataPos += 512;
             if (map_pop->package_sum <= map_pop->package_num)
             {
                 break;

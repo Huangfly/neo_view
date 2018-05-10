@@ -26,7 +26,7 @@ namespace MapTcp {
         void run();
     private:
         bool isThreadRunning;
-        CMDVEL_PACKAGE_POP pop_body;
+        Neo_Packet::CMDVEL_PACKAGE_POP pop_body;
     };
 }
 

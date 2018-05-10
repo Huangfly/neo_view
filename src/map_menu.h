@@ -43,7 +43,7 @@ private:
     Ui::map_menu *ui;
     map_main *m_map_main_ctl;
     Map_View *m_map_view_ctl;
-    CMDVEL_PACKAGE_POP cmdvel_body;
+    Neo_Packet::CMDVEL_PACKAGE_POP cmdvel_body;
     QTimer *m_cmdvel_timer;
 };
 

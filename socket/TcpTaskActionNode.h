@@ -26,7 +26,7 @@ namespace MapTcp {
         void run();
     private:
         bool isThreadRunning;
-        NODECTL_PACKAGE_POP pop_body;
+        Neo_Packet::NODECTL_PACKAGE_POP pop_body;
     };
 }
 #endif // TCPTASKACTIONNODE_H

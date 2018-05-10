@@ -41,9 +41,9 @@ namespace MapWin {
         void LoadMap(QString file_name);
         void SaveMap(QString file_name);
 
-        void updateRobotPose(STATUS_PACKAGE_ACK pose);
+        void updateRobotPose(Neo_Packet::STATUS_PACKAGE_ACK pose);
         bool GetGoal(MapWin::POSE &goal);
-        bool GetGoal(GOAL_PACKAGE_POP *goal);
+        bool GetGoal(Neo_Packet::GOAL_PACKAGE_POP *goal);
         void ClearGoals(){ model_->clearGoals();view_->updateUI(); }
 
         //

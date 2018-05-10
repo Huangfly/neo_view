@@ -16,25 +16,17 @@ TcpTaskCmdVel::~TcpTaskCmdVel()
 
 void MapTcp::TcpTaskCmdVel::run()
 {
-    char pop_buf[80];
-    char ack_buf[80];
 
     this->isThreadRunning = true;
-    if(!this->p_socket->connectSocket(this)) {
+    if(!this->p_socket->connectSocket()) {
         this->isThreadRunning = false;
         return;
     }
 
-    P_HEAD *head = (P_HEAD*)(pop_buf+1);
-    CMDVEL_PACKAGE_POP *pop_package = (CMDVEL_PACKAGE_POP*)(pop_buf+1+sizeof(P_HEAD));
-    head->funcId = PACK_CMDVEL;
-    head->msg_code = 0;
-    head->size = sizeof(P_HEAD)+sizeof(CMDVEL_PACKAGE_POP);
-    memcpy(pop_package,&pop_body,sizeof(CMDVEL_PACKAGE_POP));
+    this->InitPacket(Neo_Packet::PacketType::CMDVEL, sizeof(Neo_Packet::CMDVEL_PACKAGE_POP), sizeof(Neo_Packet::CMDVEL_PACKAGE_ACK));
 
-    pop_buf[0] = 0xAA;
-    pop_buf[1+sizeof(P_HEAD)+sizeof(CMDVEL_PACKAGE_POP)+1]=0xAB;
-    if(this->p_socket->SendSockPackage(pop_buf,sizeof(CMDVEL_PACKAGE_ACK),ack_buf) == head->funcId)
+
+    if(this->p_socket->SendSockPackage(this->packet_send, sizeof(Neo_Packet::CMDVEL_PACKAGE_ACK), this->packet_recv) == this->PacketSend_Head->function_id)
     {
         printf("Goal cancel success...\n");
     }

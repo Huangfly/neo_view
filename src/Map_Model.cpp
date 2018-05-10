@@ -427,6 +427,7 @@ void Map_Model::drawGL()
                         i*LidarDatas.angle_increment);
             lidar_x_start = lidar_x_old;
             lidar_y_start = lidar_y_old;
+            break;
         }
         for(; i<LidarDatas.data.size();i++){
             if(std::isinf(LidarDatas.data[i]))continue;
@@ -645,7 +646,7 @@ void Map_Model::LoadMap(QString file_name)
     pthread_mutex_unlock(mutex_update_ptr);
 }
 /*-------------------------------------------------------------------------------------------------------*/
-void Map_Model::updateRobot(STATUS_PACKAGE_ACK pose)
+void Map_Model::updateRobot(Neo_Packet::STATUS_PACKAGE_ACK pose)
 {
     pthread_mutex_lock(mutex_update_ptr);
     // is goal areach?
